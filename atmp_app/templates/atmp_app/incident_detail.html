@@ -1,0 +1,27 @@
+<!-- /home/siisi/atmp/atmp_app/templates/atmp_app/incident_detail.html -->
+
+{% extends "base.html" %}
+{% load file_extras %}
+{% block title %}Incident: {{ incident.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ incident.title }}</h1>
+<p><strong>Status:</strong> {{ incident.get_status_display }}</p>
+<p><strong>Date of Incident:</strong> {{ incident.date_of_incident }}</p>
+<p><strong>Location:</strong> {{ incident.location }}</p>
+<p><strong>Description:</strong></p>
+<p>{{ incident.description|linebreaks }}</p>
+<hr>
+<h2>Documents</h2>
+<ul>
+    {% for doc in incident.documents.all %}
+    <li>
+        <a href="{{ doc.file.url }}">{{ doc.file.name|basename }}</a>
+        uploaded by {{ doc.uploaded_by.email }} on {{ doc.uploaded_at }}
+    </li>
+    {% empty %}
+    <li>No documents attached.</li>
+    {% endfor %}
+</ul>
+<p><a href="{% url 'atmp_app:incident-list' %}">&larr; Back to list</a></p>
+{% endblock %}

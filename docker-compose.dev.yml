@@ -1,0 +1,33 @@
+# /home/siisi/atmp/docker-compose.dev.yml
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    env_file:
+      - .env.dev
+    environment:
+      - ENVIRONMENT=dev
+    volumes:
+      - dbt_data_dev:/var/lib/postgresql/data
+
+  dbt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8009:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env.dev
+    environment:
+      - ENVIRONMENT=dev
+
+volumes:
+  dbt_data_dev:

@@ -1,0 +1,17 @@
+# .dockerignore
+*
+!.gitignore
+!requirements.txt
+!manage.py
+!atmp_project/
+!users/
+!atmp_app/
+!templates/
+!static/
+!staticfiles/
+!media/
+!entrypoint.sh
+!docker-compose*
+!Dockerfile
+!.env.prod
+!locale/

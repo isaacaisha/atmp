@@ -1,0 +1,8 @@
+{% extends 'atmp_app/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<p>Welcome to your dashboard!</p>
+<p><a href="{% url 'atmp_app:incident-create' %}" class="btn btn-success">Report New Incident</a></p>
+{# maybe embed the IncidentListView here or some metrics #}
+{% endblock %}

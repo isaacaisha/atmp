@@ -1,0 +1,18 @@
+<!-- /home/siisi/atmp/atmp_app/templates/atmp_app/incident_form.html -->
+
+{% extends "base.html" %}
+{% block title %}Report Incident{% endblock %}
+
+{% block content %}
+<h1>Report a New ATMP Incident</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <table>
+        {{ form.as_table }}
+    </table>
+    
+    <button type="submit">Submit</button>
+</form>
+</form>
+{% endblock %}

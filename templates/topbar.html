@@ -1,0 +1,18 @@
+<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+    <!-- Topbar content (search, profile dropdown, etc.) -->
+    <a href="{% url 'users:home' %}">Home</a> |
+    {% if user.is_authenticated %}
+    <span>Hello {{ user.name|default:user.email }}!</span>
+    <form method="post" action="{% url 'users:logout' %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit"
+                style="background:none;border:none;cursor:pointer"
+                class="text-primary">|
+            Logout
+        </button>
+    </form>
+    {% else %}
+    <a href="{% url 'users:login' %}">Login</a> |
+    <a href="{% url 'users:register' %}">Register</a>
+    {% endif %}
+</nav>

@@ -1,0 +1,16 @@
+<!-- /home/siisi/atmp/users/templates/users/register.html -->
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<h1>Create an account</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <button type="submit">Register</button>
+</form>
+<p>Already have an account? <a href="{% url 'users:login' %}">Login</a></p>
+{% endblock %}

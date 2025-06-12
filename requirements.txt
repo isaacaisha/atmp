@@ -1,0 +1,16 @@
+asgiref==3.8.1
+dj-database-url==3.0.0
+Django==5.2.3
+django-filter==25.1
+djangorestframework==3.16.0
+gevent==25.5.1
+greenlet==3.2.3
+gunicorn==23.0.0
+packaging==25.0
+pillow==11.2.1
+psycopg2-binary==2.9.10
+python-dotenv==1.1.0
+sqlparse==0.5.3
+typing_extensions==4.14.0
+zope.event==5.0
+zope.interface==7.2

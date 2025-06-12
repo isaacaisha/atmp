@@ -1,0 +1,20 @@
+<!-- /home/siisi/atmp/users/templates/users/home.html -->
+{% extends "base.html" %}
+
+{% block title %}Home – ATMP Portal{% endblock %}
+
+{% block content %}
+<h1>Welcome{% if user.is_authenticated %}, {{ user.name|default:user.email }}{% endif %}!</h1>
+
+{% if user.is_authenticated %}
+<p>Use the links below to get started:</p>
+<ul>
+    <li><a href="{% url 'atmp_app:incident-list' %}">My ATMP Incidents</a></li>
+    
+    <li><a href="{% url 'atmp_app:incident-create' %}">Report a New Incident</a></li>
+</ul>
+{% else %}
+<p>You’re not logged in. Please <a href="{% url 'users:login' %}">login</a> or <a
+        href="{% url 'users:register' %}">register</a> to access the ATMP portal.</p>
+{% endif %}
+{% endblock %}
