@@ -1,8 +1,25 @@
-{% extends 'atmp_app/base.html' %}
-{% block title %}Dashboard{% endblock %}
+<!-- /home/siisi/atmp/atmp_app/templates/dashboard.html -->
+
+{% extends "base.html" %}
+{% load static i18n %}
+{% block title %}{% trans "Dashboard" %}{% endblock %}
+
 {% block content %}
-<h1>Dashboard</h1>
-<p>Welcome to your dashboard!</p>
-<p><a href="{% url 'atmp_app:incident-create' %}" class="btn btn-success">Report New Incident</a></p>
-{# maybe embed the IncidentListView here or some metrics #}
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                    {% trans "Incidents Reported" %}
+                </div>
+                <div class="h5 mb-0 font-weight-bold">{{ incidents_count }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <a href="{% url 'atmp_app:incident-create' %}" class="btn btn-success w-100 h-100">
+            + {% trans "Report New Incident" %}
+        </a>
+    </div>
+</div>
 {% endblock %}

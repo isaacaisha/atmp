@@ -1,3 +1,37 @@
+<!-- /home/siisi/atmp/templates/sidebar.html -->
+
+{% load i18n %}
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-    <!-- Sidebar content (logo, nav links, etc.) -->
+    <!-- Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'users:home' %}">
+        <div class="sidebar-brand-icon"><i class="fas fa-hard-hat"></i></div>
+        <div class="sidebar-brand-text mx-2">ATMP</div>
+    </a>
+
+    <hr class="sidebar-divider my-0">
+
+    <!-- Dashboard -->
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'atmp_app:dashboard' %}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>{% trans "Dashboard" %}</span>
+        </a>
+    </li>
+    <hr class="sidebar-divider">
+
+    <!-- Incidents -->
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'atmp_app:incident-list' %}">
+            <i class="fas fa-fw fa-list"></i>
+            <span>{% trans "My Incidents" %}</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'atmp_app:incident-create' %}">
+            <i class="fas fa-fw fa-plus-circle"></i>
+            <span>{% trans "Report Incident" %}</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider d-none d-md-block">
 </ul>

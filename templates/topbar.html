@@ -1,18 +1,38 @@
-<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-    <!-- Topbar content (search, profile dropdown, etc.) -->
-    <a href="{% url 'users:home' %}">Home</a> |
-    {% if user.is_authenticated %}
-    <span>Hello {{ user.name|default:user.email }}!</span>
-    <form method="post" action="{% url 'users:logout' %}" style="display:inline">
-        {% csrf_token %}
-        <button type="submit"
-                style="background:none;border:none;cursor:pointer"
-                class="text-primary">|
-            Logout
+<!-- /home/siisi/atmp/templates/topbar.html -->
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'users:home' %}">
+            ATMP Portal
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topbarNavbar"
+            aria-controls="topbarNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
-    </form>
-    {% else %}
-    <a href="{% url 'users:login' %}">Login</a> |
-    <a href="{% url 'users:register' %}">Register</a>
-    {% endif %}
+
+        <!-- collapse + justify-content-end will push everything inside to the right -->
+        <div class="collapse navbar-collapse justify-content-end" id="topbarNavbar">
+
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <form method="post" action="{% url 'users:logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link nav-link px-2">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:login' %}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'users:register' %}">Register</a>
+                </li>
+                {% endif %}
+            </ul>
+
+        </div>
+    </div>
 </nav>

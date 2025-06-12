@@ -1,18 +1,72 @@
 <!-- /home/siisi/atmp/atmp_app/templates/atmp_app/incident_form.html -->
 
 {% extends "base.html" %}
-{% block title %}Report Incident{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Report Incident" %}{% endblock %}
 
 {% block content %}
-<h1>Report a New ATMP Incident</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    <table>
-        {{ form.as_table }}
-    </table>
-    
-    <button type="submit">Submit</button>
-</form>
-</form>
+<h1 class="h3 mb-4">{% trans "New ATMP Incident" %}</h1>
+
+<div class="card shadow-sm mb-5">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="mb-3">
+                {{ form.safety_manager.label_tag }}
+                {{ form.safety_manager }}
+                {{ form.safety_manager.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.title.label_tag }}
+                {{ form.title }}
+                {{ form.title.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.description.label_tag }}
+                {{ form.description }}
+                {{ form.description.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.date_of_incident.label_tag }}
+                {{ form.date_of_incident }}
+                {{ form.date_of_incident.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.location.label_tag }}
+                {{ form.location }}
+                {{ form.location.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.status.label_tag }}
+                {{ form.status }}
+                {{ form.status.errors }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.document.label_tag }}
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-paperclip"></i></span>
+                    {{ form.document }}
+                </div>
+                {{ form.document.errors }}
+                <div class="form-text">
+                    {% trans "Allowed: PDF, DOC, JPG, PNG (max 10MB)" %}
+                </div>
+            </div>
+
+            <div class="d-grid text-center mt-4">
+                <button type="submit" class="btn btn-primary">
+                    {% trans "Submit" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

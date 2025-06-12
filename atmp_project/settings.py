@@ -83,9 +83,11 @@ INSTALLED_APPS = [
 
     # 1) my custom user app
     'users.apps.UsersConfig',
+    'whitenoise.runserver_nostatic',  # for using WhiteNoise
 
     # 2) third-party
     'rest_framework',
+    'widget_tweaks',
 
     # 3) my ATMP app
     'atmp_app.apps.AtmpAppConfig',
@@ -93,6 +95,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -180,6 +183,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media/'

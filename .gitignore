@@ -190,3 +190,5 @@ dump.rdb
 /static/media/
 /media/
 /staticfiles/
+
+node_modules

@@ -1,33 +1,49 @@
 <!-- /home/siisi/atmp/atmp_app/templates/atmp_app/incident_list.html -->
 
 {% extends "base.html" %}
-{% block title %}My Incidents{% endblock %}
+{% load static i18n %}
+{% block title %}{% trans "My Incidents" %}{% endblock %}
 
 {% block content %}
-  <h1>My ATMP Incidents</h1>
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Date</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for inc in incidents %}
-      <tr>
-        <td><a href="{% url 'atmp_app:incident-detail' inc.pk %}">{{ inc.title }}</a></td>
-        <td>{{ inc.date_of_incident }}</td>
-        <td>{{ inc.get_status_display }}</td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="3">No incidents reported yet.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% if user.role == 'employee' %}
-  <p><a href="{% url 'atmp_app:incident-create' %}">Report a New Incident</a></p>
-  {% endif %}
+<h1 class="h3 mb-4">{% trans "My ATMP Incidents" %}</h1>
+
+<div class="card shadow-sm mb-5">
+  <div class="card-body">
+    <table class="table table-striped">
+      <thead class="table-light">
+        <tr>
+          <th>{% trans "Title" %}</th>
+          <th>{% trans "Date" %}</th>
+          <th>{% trans "Status" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inc in incidents %}
+        <tr>
+          <td>
+            <a href="{% url 'atmp_app:incident-detail' inc.pk %}">
+              {{ inc.title }}
+            </a>
+          </td>
+          <td>{{ inc.date_of_incident }}</td>
+          <td>{{ inc.get_status_display }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" class="text-center">
+            {% trans "No incidents reported yet." %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if user.role == 'employee' %}
+    <div class="text-center">
+      <a href="{% url 'atmp_app:incident-create' %}" class="btn btn-success">
+        {% trans "Report a New Incident" %}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

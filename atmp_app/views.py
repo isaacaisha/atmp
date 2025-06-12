@@ -127,4 +127,5 @@ class IncidentDetailView(LoginRequiredMixin, DetailView):
 
 def dashboard_view(request):
     # you can pull in any context data you need here
-    return render(request, 'dashboard.html')
+    count = ATMPIncident.objects.count()
+    return render(request, 'dashboard.html', {'incidents_count': count})

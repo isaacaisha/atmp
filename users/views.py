@@ -5,6 +5,8 @@ from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 
+from atmp_app.models import ATMPIncident
+
 
 class RegisterView(CreateView):
     template_name = 'users/register.html'
@@ -24,3 +26,12 @@ class CustomLogoutView(LogoutView):
 # Optionally, a simple “home” view for logged-in users:
 class HomeView(TemplateView):
     template_name = 'home.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.is_authenticated:
+            ctx['incidents_count'] = ATMPIncident.objects.filter(provider=user).count()
+        else:
+            ctx['incidents_count'] = 0
+        return ctx

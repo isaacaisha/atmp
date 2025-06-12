@@ -1,10 +1,8 @@
-{% load static i18n %}
-{% load tz %}
+<!-- /home/siisi/atmp/templates/footer.html -->
 
-<footer class="sticky-footer bg-white">
-    <div class="container my-auto">
-        <div class="copyright text-center my-auto">
-            <span>© DBT {% trans 'Copyright' %} {% now "j F Y" %}</span>
-        </div>
+{% load tz i18n %}
+<footer class="sticky-footer bg-white border-top py-3">
+    <div class="container text-center">
+        <small>© DBT {% trans 'Copyright' %} {% now "j F Y" %}</small>
     </div>
 </footer>
