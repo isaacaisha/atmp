@@ -9,14 +9,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import ListView, CreateView, DetailView
+from django.views.generic import TemplateView, CreateView, ListView, DetailView
 
 from .models import ATMPIncident, ATMPDocument
 from .forms import IncidentForm
 from .serializers import ATMPIncidentSerializer, ATMPDocumentSerializer
 from .permissions import IsProvider
-
-from django.shortcuts import render
 
 
 # ----- API ViewSets (DRF) ----------------------------------------------
@@ -71,6 +69,22 @@ class EmployeeRequiredMixin(UserPassesTestMixin):
         return self.request.user.is_authenticated and self.request.user.role == 'employee'
 
 
+# Optionally, a simple “home” view for logged-in users:
+class DashboardView(LoginRequiredMixin, TemplateView):
+    login_url = reverse_lazy('users:login')
+    redirect_field_name = 'next'
+    template_name = 'atmp_app/dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.is_authenticated:
+            ctx['incidents_count'] = ATMPIncident.objects.filter(provider=user).count()
+        else:
+            ctx['incidents_count'] = 0
+        return ctx
+
+
 class IncidentCreateView(LoginRequiredMixin, EmployeeRequiredMixin, CreateView):
     """
     HTML View: Employee-only form to report a new ATMP incident.
@@ -123,9 +137,3 @@ class IncidentDetailView(LoginRequiredMixin, DetailView):
     model = ATMPIncident
     template_name = 'atmp_app/incident_detail.html'
     context_object_name = 'incident'
-
-
-def dashboard_view(request):
-    # you can pull in any context data you need here
-    count = ATMPIncident.objects.count()
-    return render(request, 'dashboard.html', {'incidents_count': count})

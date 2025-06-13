@@ -28,9 +28,12 @@ class IncidentForm(forms.ModelForm):
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
     location = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+    STATUS_CHOICES = [('', 'Select a status')] + ATMPIncident.STATUS_CHOICES
     status = forms.ChoiceField(
         choices=ATMPIncident.STATUS_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-select'})
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        required=True,
     )
 
     document = forms.FileField(

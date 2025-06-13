@@ -15,6 +15,7 @@ def validate_file_extension(value):
 
 class ATMPIncident(models.Model):
     STATUS_CHOICES = [
+        ('', 'Select a choice'),
         ('declared', 'Declared'),
         ('in_progress', 'In Progress'),
         ('closed', 'Closed'),
@@ -36,7 +37,7 @@ class ATMPIncident(models.Model):
     description = models.TextField()
     date_of_incident = models.DateField()
     location = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='declared')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -5,45 +5,56 @@
 {% block title %}{% trans "My Incidents" %}{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4">{% trans "My ATMP Incidents" %}</h1>
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+  <h1 class="h3 mb-0 text-gray-800">{% trans "My ATMP Incidents" %}</h1>
+  {% if user.role == 'employee' %}
+  <a href="{% url 'atmp_app:incident-create' %}" class="btn btn-sm btn-primary shadow-sm">
+    <i class="fas fa-plus fa-sm text-white-50 me-1"></i> {% trans "Report a New Incident" %}
+  </a>
+  {% endif %}
+</div>
 
-<div class="card shadow-sm mb-5">
+<!-- Incidents Table -->
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">
+      <i class="fas fa-list-ul me-2"></i> {% trans "Reported Incidents" %}
+    </h6>
+  </div>
   <div class="card-body">
-    <table class="table table-striped">
-      <thead class="table-light">
-        <tr>
-          <th>{% trans "Title" %}</th>
-          <th>{% trans "Date" %}</th>
-          <th>{% trans "Status" %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for inc in incidents %}
-        <tr>
-          <td>
-            <a href="{% url 'atmp_app:incident-detail' inc.pk %}">
-              {{ inc.title }}
-            </a>
-          </td>
-          <td>{{ inc.date_of_incident }}</td>
-          <td>{{ inc.get_status_display }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="3" class="text-center">
-            {% trans "No incidents reported yet." %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% if user.role == 'employee' %}
-    <div class="text-center">
-      <a href="{% url 'atmp_app:incident-create' %}" class="btn btn-success">
-        {% trans "Report a New Incident" %}
-      </a>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col"><i class="fas fa-file-alt me-1"></i>{% trans "Title" %}</th>
+            <th scope="col"><i class="fas fa-calendar-day me-1"></i>{% trans "Date" %}</th>
+            <th scope="col"><i class="fas fa-info-circle me-1"></i>{% trans "Status" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inc in incidents %}
+          <tr>
+            <td>
+              <a href="{% url 'atmp_app:incident-detail' inc.pk %}" class="text-decoration-none">
+                {{ inc.title }}
+              </a>
+            </td>
+            <td>{{ inc.date_of_incident|date:"F j, Y" }}</td>
+            <td>
+              <span class="badge bg-info text-dark">{{ inc.get_status_display }}</span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3" class="text-center text-muted">
+              <em>{% trans "No incidents reported yet." %}</em>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    {% endif %}
   </div>
 </div>
 {% endblock %}

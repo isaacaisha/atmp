@@ -4,6 +4,7 @@ import os
 import dotenv
 import dj_database_url
 from pathlib import Path
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -83,6 +84,7 @@ INSTALLED_APPS = [
 
     # 1) my custom user app
     'users.apps.UsersConfig',
+    'dashboard.apps.DashboardConfig',
     'whitenoise.runserver_nostatic',  # for using WhiteNoise
 
     # 2) third-party
@@ -242,8 +244,13 @@ CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
-LOGIN_REDIRECT_URL = '/' 
-LOGOUT_REDIRECT_URL = '/'
+#LOGIN_URL = '/accounts/login/'
+#LOGIN_REDIRECT_URL = '/api/atmp/dashboard/'
+#LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+LOGIN_URL = reverse_lazy('users:login')
+LOGIN_REDIRECT_URL = reverse_lazy('atmp_app:dashboard')
+LOGOUT_REDIRECT_URL = reverse_lazy('users:login')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

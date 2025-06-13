@@ -1,69 +1,83 @@
 <!-- /home/siisi/atmp/atmp_app/templates/atmp_app/incident_form.html -->
 
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n widget_tweaks %}
+
 {% block title %}{% trans "Report Incident" %}{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-4">{% trans "New ATMP Incident" %}</h1>
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{% trans "New ATMP Incident" %}</h1>
+</div>
 
-<div class="card shadow-sm mb-5">
+<!-- Card -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "Incident Reporting Form" %}</h6>
+    </div>
     <div class="card-body">
         <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
             {{ form.non_field_errors }}
 
-            <div class="mb-3">
-                {{ form.safety_manager.label_tag }}
-                {{ form.safety_manager }}
-                {{ form.safety_manager.errors }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.safety_manager.id_for_label }}" class="form-label">{% trans "Safety Manager" %}</label>
+                    {{ form.safety_manager|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.safety_manager.errors }}</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">{% trans "Title" %}</label>
+                    {{ form.title|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.title.errors }}</div>
+                </div>
             </div>
 
             <div class="mb-3">
-                {{ form.title.label_tag }}
-                {{ form.title }}
-                {{ form.title.errors }}
+                <label for="{{ form.description.id_for_label }}" class="form-label">{% trans "Description" %}</label>
+                {{ form.description|add_class:"form-control" }}
+                <div class="text-danger small">{{ form.description.errors }}</div>
             </div>
 
-            <div class="mb-3">
-                {{ form.description.label_tag }}
-                {{ form.description }}
-                {{ form.description.errors }}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.date_of_incident.id_for_label }}" class="form-label">{% trans "Date of Incident" %}</label>
+                    {{ form.date_of_incident|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.date_of_incident.errors }}</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.location.id_for_label }}" class="form-label">{% trans "Location" %}</label>
+                    {{ form.location|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.location.errors }}</div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                {{ form.date_of_incident.label_tag }}
-                {{ form.date_of_incident }}
-                {{ form.date_of_incident.errors }}
-            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">{% trans "Status" %}</label>
+                    {{ form.status|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.status.errors }}</div>
+                </div>
 
-            <div class="mb-3">
-                {{ form.location.label_tag }}
-                {{ form.location }}
-                {{ form.location.errors }}
-            </div>
-
-            <div class="mb-3">
-                {{ form.status.label_tag }}
-                {{ form.status }}
-                {{ form.status.errors }}
-            </div>
-
-            <div class="mb-3">
-                {{ form.document.label_tag }}
+                <div class="col-md-6 mb-3">
+                <label for="{{ form.document.id_for_label }}" class="form-label">{% trans "Attach Document" %}</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-paperclip"></i></span>
-                    {{ form.document }}
+                    {{ form.document|add_class:"form-control" }}
                 </div>
-                {{ form.document.errors }}
-                <div class="form-text">
+                <div class="text-danger small">{{ form.document.errors }}</div>
+                <div class="form-text small text-muted">
                     {% trans "Allowed: PDF, DOC, JPG, PNG (max 10MB)" %}
                 </div>
             </div>
+            </div>
 
-            <div class="d-grid text-center mt-4">
+            <div class="d-grid text-center">
                 <button type="submit" class="btn btn-primary">
-                    {% trans "Submit" %}
+                    <i class="fas fa-paper-plane me-1"></i> {% trans "Submit Incident" %}
                 </button>
             </div>
         </form>

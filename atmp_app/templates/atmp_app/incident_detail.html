@@ -2,47 +2,76 @@
 
 {% extends "base.html" %}
 {% load i18n file_extras %}
+
 {% block title %}{{ incident.title }}{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-3">{{ incident.title }}</h1>
-
-<div class="row">
-    <div class="col-md-6">
-        <dl class="row">
-            <dt class="col-sm-4">{% trans "Status" %}</dt>
-            <dd class="col-sm-8">{{ incident.get_status_display }}</dd>
-
-            <dt class="col-sm-4">{% trans "Date" %}</dt>
-            <dd class="col-sm-8">{{ incident.date_of_incident }}</dd>
-
-            <dt class="col-sm-4">{% trans "Location" %}</dt>
-            <dd class="col-sm-8">{{ incident.location }}</dd>
-        </dl>
-    </div>
-    <div class="col-md-6">
-        <p>{{ incident.description|linebreaks }}</p>
-    </div>
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{{ incident.title }}</h1>
 </div>
 
-<hr>
-<h4>{% trans "Documents" %}</h4>
-<ul class="list-group mb-4">
-    {% for doc in incident.documents.all %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        <a href="{{ doc.file.url }}">{{ doc.file.name|basename }}</a>
-        <small class="text-muted">
-            {{ doc.uploaded_by.email }} — {{ doc.uploaded_at|date:"SHORT_DATETIME_FORMAT" }}
-        </small>
-    </li>
-    {% empty %}
-    <li class="list-group-item text-center">{% trans "No documents attached." %}</li>
-    {% endfor %}
-</ul>
+<!-- Incident Details Card -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-exclamation-triangle me-2"></i> {% trans "Incident Details" %}
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <!-- Left Column -->
+            <div class="col-md-6">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">{% trans "Status" %}</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-info text-dark">{{ incident.get_status_display }}</span>
+                    </dd>
 
-<div class="text-center mb-5">
-    <a href="{% url 'atmp_app:incident-list' %}" class="btn btn-secondary">
-        &larr; {% trans "Back to List" %}
-    </a>
+                    <dt class="col-sm-4">{% trans "Date" %}</dt>
+                    <dd class="col-sm-8">{{ incident.date_of_incident|date:"F j, Y" }}</dd>
+
+                    <dt class="col-sm-4">{% trans "Location" %}</dt>
+                    <dd class="col-sm-8">{{ incident.location }}</dd>
+                </dl>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <h6 class="font-weight-bold">{% trans "Description" %}</h6>
+                    <p class="text-muted">{{ incident.description|linebreaks }}</p>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Documents Section -->
+        <h5 class="mb-3"><i class="fas fa-paperclip me-2"></i>{% trans "Documents" %}</h5>
+        <ul class="list-group mb-4">
+            {% for doc in incident.documents.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-file-alt text-primary me-2"></i>
+                    <a href="{{ doc.file.url }}" target="_blank">{{ doc.file.name|basename }}</a>
+                </div>
+                <small class="text-muted text-end">
+                    {{ doc.uploaded_by.email }}<br>
+                    {{ doc.uploaded_at|date:"SHORT_DATETIME_FORMAT" }}
+                </small>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-center text-muted">{% trans "No documents attached." %}</li>
+            {% endfor %}
+        </ul>
+
+        <!-- Back Button -->
+        <div class="text-center">
+            <a href="{% url 'atmp_app:incident-list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> {% trans "Back to List" %}
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

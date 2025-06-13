@@ -3,12 +3,30 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from django.views.generic import RedirectView
 from django.conf.urls.static import static
 
-
 urlpatterns = [
+    # 1) Root URL (“/”) → redirect to the dashboard URL by its name
+    path(
+        '',
+        RedirectView.as_view(pattern_name='atmp_app:dashboard', permanent=False),
+        name='root-redirect'
+    ),
+
+    # 2) Admin site
     path('admin/', admin.site.urls),
-    path('', include('users.urls', namespace='users')),
+
+    # 3) Built‑in auth views (login, logout, password reset at /accounts/…)
+    path('accounts/', include(('django.contrib.auth.urls', 'accounts'), namespace='accounts')),
+
+    # 4) Your custom user URLs (register, etc.); still lives under /register/, /login/, etc.
+    path('users/', include('users.urls', namespace='users')),
+
+    # 5) Dashboard pages under /dashboard/
+    path('dashboard/', include('dashboard.urls', namespace='dashboard')),
+
+    # 6) ATMP API
     path('api/atmp/', include(('atmp_app.urls','atmp_app'), namespace='atmp_app')),
 ]
 

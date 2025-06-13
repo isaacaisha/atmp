@@ -2,10 +2,12 @@
 
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import (
+    LoginView, LogoutView,
+    PasswordResetView, PasswordResetDoneView,
+    PasswordResetConfirmView, PasswordResetCompleteView
+)
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
-
-from atmp_app.models import ATMPIncident
 
 
 class RegisterView(CreateView):
@@ -23,15 +25,21 @@ class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('users:login')
 
 
-# Optionally, a simple “home” view for logged-in users:
-class HomeView(TemplateView):
-    template_name = 'home.html'
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'users/password_reset.html'
+    email_template_name = 'users/password_reset_email.txt'
+    subject_template_name = 'users/password_reset_subject.txt'
+    success_url = reverse_lazy('users:password_reset_done')
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        user = self.request.user
-        if user.is_authenticated:
-            ctx['incidents_count'] = ATMPIncident.objects.filter(provider=user).count()
-        else:
-            ctx['incidents_count'] = 0
-        return ctx
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'users/password_reset_done.html'
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'users/password_reset_confirm.html'
+    success_url = reverse_lazy('users:password_reset_complete')
+
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'users/password_reset_complete.html'

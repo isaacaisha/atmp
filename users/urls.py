@@ -1,13 +1,25 @@
 # /home/siisi/atmp/users/urls.py
 
 from django.urls import path
-from .views import RegisterView, CustomLoginView, CustomLogoutView, HomeView
+from . import views
 
 app_name = 'users'
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='home'),
-    path('register/', RegisterView.as_view(), name='register'),
-    path('login/', CustomLoginView.as_view(), name='login'),
-    path('logout/', CustomLogoutView.as_view(), name='logout'),
+    path('login/',  views.CustomLoginView.as_view(),          name='login'),
+    path('logout/', views.CustomLogoutView.as_view(),         name='logout'),
+    path('register/', views.RegisterView.as_view(),           name='register'),
+
+    path('password-reset/',
+         views.CustomPasswordResetView.as_view(),
+         name='password_reset'),
+    path('password-reset/done/',
+         views.CustomPasswordResetDoneView.as_view(),
+         name='password_reset_done'),
+    path('reset/<uidb64>/<token>/',
+         views.CustomPasswordResetConfirmView.as_view(),
+         name='password_reset_confirm'),
+    path('reset/done/',
+         views.CustomPasswordResetCompleteView.as_view(),
+         name='password_reset_complete'),
 ]
