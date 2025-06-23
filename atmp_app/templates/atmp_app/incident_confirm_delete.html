@@ -1,0 +1,46 @@
+<!-- /home/siisi/atmp/atmp_app/templates/atmp_app/incident_confirm_delete.html -->
+
+{% extends "base.html" %}
+{% load i18n file_extras %}
+
+{% block title %}{{ incident.title }}{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{% trans 'Delete Incident' %}: {{ incident.title }}</h1>
+</div>
+
+<!-- Incident Details Card -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-danger">
+            <i class="fas fa-trash me-2"></i> {% trans 'Delete Incident' %}
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <p class="card-text fs-5">
+                {% trans 'Are you sure you want to delete' %}
+                <strong class="text-dark">"{{ incident.title }}"</strong>?
+            </p>
+
+            <div class="col-12 mt-3">
+                <form method="post" class="d-flex justify-content-between gap-3">
+                    {% csrf_token %}
+                    <div>
+                        <a href="{% url 'atmp_app:incident-list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> {% trans 'Cancel' %}
+                        </a>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i> {% trans 'Yes, delete' %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

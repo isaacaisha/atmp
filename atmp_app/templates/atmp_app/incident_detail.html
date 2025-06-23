@@ -49,7 +49,7 @@
 
         <!-- Documents Section -->
         <h5 class="mb-3"><i class="fas fa-paperclip me-2"></i>{% trans "Documents" %}</h5>
-        <ul class="list-group mb-4">
+        <ul class="list-group mb-4 text-wrap text-break">
             {% for doc in incident.documents.all %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
@@ -57,7 +57,8 @@
                     <a href="{{ doc.file.url }}" target="_blank">{{ doc.file.name|basename }}</a>
                 </div>
                 <small class="text-muted text-end">
-                    {{ doc.uploaded_by.email }}<br>
+                    {{ doc.uploaded_by.name }}<br>
+                    <a href="mailto:{{ doc.uploaded_by.email }}">{{ doc.uploaded_by.email }}</a><br>
                     {{ doc.uploaded_at|date:"SHORT_DATETIME_FORMAT" }}
                 </small>
             </li>
@@ -65,13 +66,12 @@
             <li class="list-group-item text-center text-muted">{% trans "No documents attached." %}</li>
             {% endfor %}
         </ul>
-
-        <!-- Back Button -->
-        <div class="text-center">
-            <a href="{% url 'atmp_app:incident-list' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-1"></i> {% trans "Back to List" %}
-            </a>
-        </div>
     </div>
+</div>
+<!-- Back Button -->
+<div class="text-center mb-3">
+    <a href="{% url 'atmp_app:incident-list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i> {% trans "Back to List" %}
+    </a>
 </div>
 {% endblock %}

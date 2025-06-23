@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import CustomUser
 
+
 class CustomUserCreationForm(UserCreationForm):
     ROLE_PROMPT = [('', 'Select a role')] + CustomUser.ROLE_CHOICES[1:]
     role = forms.ChoiceField(
@@ -38,6 +39,7 @@ class CustomUserCreationForm(UserCreationForm):
             'placeholder': 'Repeat Password',
             'class': 'form-control form-control-user',
         })
+
 
 class CustomAuthenticationForm(AuthenticationForm):
     username_field = CustomUser._meta.get_field('email')

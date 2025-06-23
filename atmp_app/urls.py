@@ -4,9 +4,14 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 from rest_framework.routers import DefaultRouter
 from .views import (
-    ATMPIncidentViewSet, ATMPDocumentViewSet,
+    ATMPIncidentViewSet,
+    ATMPDocumentViewSet,
     DashboardView,
-    IncidentListView, IncidentDetailView, IncidentCreateView,
+    IncidentCreateView,
+    IncidentListView,
+    IncidentDetailView,
+    IncidentUpdateView,
+    IncidentDeleteView,
 )
 
 app_name = 'atmp_app'
@@ -25,6 +30,8 @@ urlpatterns = [
     path('incidents/create/',   IncidentCreateView.as_view(), name='incident-create'),
     path('incidents/',          IncidentListView.as_view(),   name='incident-list'),
     path('incidents/<int:pk>/', IncidentDetailView.as_view(), name='incident-detail'),
+    path('incidents/<int:pk>/edit/', IncidentUpdateView.as_view(), name='incident-update'),
+    path('incidents/<int:pk>/delete/', IncidentDeleteView.as_view(), name='incident-delete'),
 
     # API endpoints
     path('api/', include((router.urls, 'atmp_api'), namespace='api')),

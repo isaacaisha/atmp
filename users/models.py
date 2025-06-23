@@ -2,7 +2,9 @@
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django_otp import user_has_device
 from django.utils.translation import gettext as _
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -22,6 +24,7 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
         return self.create_user(email, password, **extra_fields)
+
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
@@ -44,6 +47,9 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD  = 'email'
     REQUIRED_FIELDS = []
     objects = UserManager()
+
+    def is_verified(self):
+        return user_has_device(self)
 
     def __str__(self):
         return f"{self.name} ({self.email}, {self.role})"

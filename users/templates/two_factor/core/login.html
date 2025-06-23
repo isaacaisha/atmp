@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static i18n two_factor_tags widget_tweaks %}
+
+{% block title %}{% trans 'Login' %}{% endblock %}
+
+{% block content %}
+
+<body class="bg-gradient-primary">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-12">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+          <div class="card-body p-0">
+            <div class="row">
+              <div class="d-none d-lg-block bg-login-image"></div>
+              <div class="col-lg-12">
+                <div class="p-5">
+                  <div class="text-center mb-4">
+                    <h1 class="h4 text-gray-900">{% trans "Welcome Back!" %}</h1>
+                    {% if wizard.steps.current == 'auth' %}
+                    <p>{% blocktrans %}Enter your credentials.{% endblocktrans %}</p>
+                    {% elif wizard.steps.current == 'token' %}
+                    <p>{{ device|as_verbose_action }}</p>
+                    {% elif wizard.steps.current == 'backup' %}
+                    <p>{% blocktrans trimmed %}Use this form for entering backup tokens for logging in.
+                      These tokens have been generated for you to print and keep safe. Please
+                      enter one of these backup tokens to login to your account.{% endblocktrans %}</p>
+                    {% endif %}
+                  </div>
+
+                  <form method="post" action="" class="user">
+                    {% csrf_token %}
+                    {{ wizard.management_form }}
+
+                    {% for field in wizard.form.visible_fields %}
+                    <div class="form-group">
+                      {{ field.label_tag }}
+                      {{ field|add_class:"form-control form-control-user" }}
+                      {% for error in field.errors %}
+                      <div class="text-danger small">{{ error }}</div>
+                      {% endfor %}
+                    </div>
+                    {% endfor %}
+
+                    {% if wizard.form.non_field_errors %}
+                    <div class="alert alert-danger">
+                      {% for err in wizard.form.non_field_errors %}
+                      <p class="mb-0">{{ err }}</p>
+                      {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="text-center">
+                      {% if wizard.steps.prev %}
+                      <button name="wizard_goto_step" value="{{ wizard.steps.prev }}"
+                        class="btn btn-secondary btn-user">{% trans "Back" %}</button>
+                      {% endif %}
+                      <button type="submit" class="btn btn-primary btn-user">{% trans "Next" %}</button>
+                    </div>
+                  </form>
+
+                  {% if other_devices %}
+                  <hr>
+                  <div class="text-center">
+                    <p>{% trans "Or use another authentication method:" %}</p>
+                    {% for other in other_devices %}
+                    <form method="post" action="">
+                      {% csrf_token %}
+                      <button name="challenge_device" value="{{ other.persistent_id }}"
+                        class="btn btn-outline-secondary btn-user btn-block mt-2" type="submit">
+                        {{ other|as_action }}
+                      </button>
+                    </form>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+
+                  {% if backup_tokens %}
+                  <hr>
+                  <div class="text-center">
+                    <form method="post" action="">
+                      {% csrf_token %}
+                      <button name="wizard_goto_step" type="submit" value="backup"
+                        class="btn btn-sm btn-outline-warning btn-user btn-block">
+                        {% trans "Use Backup Token" %}
+                      </button>
+                    </form>
+                  </div>
+                  {% endif %}
+
+                  <hr>
+                  <div class="text-center">
+                    <a class="small" href="{% url 'users:password_reset' %}">{% trans 'Forgot Password?' %}</a>
+                  </div>
+                  <div class="text-center">
+                    <a class="small" href="{% url 'users:register' %}">{% trans 'Create an Account!' %}</a>
+                  </div>
+
+                </div> <!-- p-5 -->
+              </div> <!-- col-lg-12 -->
+            </div> <!-- row -->
+          </div> <!-- card-body -->
+        </div> <!-- card -->
+      </div> <!-- col-lg-12 -->
+    </div> <!-- row -->
+  </div> <!-- container -->
+</body>
+{% endblock %}

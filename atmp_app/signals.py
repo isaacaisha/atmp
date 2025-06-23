@@ -19,8 +19,8 @@ def notify_syndic(sender, instance, created, **kwargs):
         Date: {instance.date_of_incident}
         Location: {instance.location}
         Description: {instance.description}
-        
-        Please review at: http://yourdomain.com/admin/atmp/atmpincident/{instance.id}/
+        Please review at: http://atmp.siisi.online/admin/atmp_app/atmpincident/{instance.id}
+        Please review at: http://atmp.siisi.online/api/atmp/incidents/{instance.id}/
         """
 
         # Collect recipients
@@ -33,7 +33,7 @@ def notify_syndic(sender, instance, created, **kwargs):
             recipients.append(instance.provider.email)
 
         # Add any static emails if needed
-        recipients.extend(['medusadbt@gmail.com', 'realcopromanager@gmail.com'])
+        recipients.extend(['medusadbt@gmail.com', 'charikajadida@gmail.com'])
 
         # Send email using EmailMessage with BCC
         email = EmailMessage(
@@ -44,5 +44,3 @@ def notify_syndic(sender, instance, created, **kwargs):
             bcc=recipients,              # Actual recipients hidden
         )
         email.send(fail_silently=False)
-
-        print("Sending email to (BCC):", recipients)

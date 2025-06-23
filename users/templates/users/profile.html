@@ -1,0 +1,32 @@
+<!-- /home/siisi/atmp/users/templates/users/profile.html -->
+
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ user.name }}’s Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2>{% trans "Welcome," %} {{ user.name }}</h2>
+    <p>
+        <strong>{% trans "Email:" %}</strong> {{ user.email }}<br>
+        <strong>{% trans "Role:" %}</strong> {{ user.get_role_display }}
+    </p>
+
+    <hr>
+
+    <h4>{% trans "Two-Factor Authentication" %}</h4>
+
+    {% if has_2fa %}
+    <p class="text-success">{% trans "2FA is currently enabled on your account." %}</p>
+    <a href="{% url 'two_factor:setup' %}" class="btn btn-secondary">
+        {% trans "Manage 2FA Device" %}
+    </a>
+    {% else %}
+    <p class="text-warning">{% trans "You have not yet enabled two-factor authentication." %}</p>
+    <a href="{% url 'two_factor:setup' %}" class="btn btn-primary">
+        {% trans "Enable Two-Factor Authentication" %}
+    </a>
+    {% endif %}
+</div>
+{% endblock %}

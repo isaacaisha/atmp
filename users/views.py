@@ -3,22 +3,39 @@
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.views import (
-    LoginView, LogoutView,
+    #LoginView, 
+    LogoutView,
     PasswordResetView, PasswordResetDoneView,
-    PasswordResetConfirmView, PasswordResetCompleteView
+    PasswordResetConfirmView, PasswordResetCompleteView,
 )
-from .forms import CustomUserCreationForm, CustomAuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from .models import CustomUser
+from .forms import (
+    CustomUserCreationForm,
+    CustomAuthenticationForm,
+)
 
 
 class RegisterView(CreateView):
     template_name = 'users/register.html'
     form_class = CustomUserCreationForm
-    success_url = reverse_lazy('users:login')
+    #success_url = reverse_lazy('users:login')
+    success_url = reverse_lazy('two_factor:login')
 
 
-class CustomLoginView(LoginView):
-    template_name = 'users/login.html'
-    authentication_form = CustomAuthenticationForm
+#class CustomLoginView(LoginView):
+#    template_name = 'users/login.html'
+#    authentication_form = CustomAuthenticationForm
+
+
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'users/profile.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['has_2fa'] = self.request.user.totpdevice_set.filter(confirmed=True).exists()
+        return context
 
 
 class CustomLogoutView(LogoutView):

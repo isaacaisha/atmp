@@ -7,6 +7,7 @@ from pathlib import Path
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -83,16 +84,24 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 1) my custom user app
-    'users.apps.UsersConfig',
-    'dashboard.apps.DashboardConfig',
+    'users',
+    'dashboard',
+    'atmp_app',
+
     'whitenoise.runserver_nostatic',  # for using WhiteNoise
 
     # 2) third-party
     'rest_framework',
     'widget_tweaks',
 
-    # 3) my ATMP app
-    'atmp_app.apps.AtmpAppConfig',
+    # 3) Two‑factor
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'django_otp.plugins.otp_email',
+    'two_factor',
+    #'two_factor.plugins.phonenumber',
+    'two_factor.plugins.email',
 ]
 
 MIDDLEWARE = [
@@ -100,6 +109,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',  
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -214,6 +224,12 @@ LOGGING = {
         'handlers': ['console', 'file'],
         'level': 'DEBUG',
     },
+    'loggers': {
+        'two_factor': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
     #'loggers': {
     #    'django': {
     #        'handlers': ['file'],
@@ -248,9 +264,15 @@ AUTH_USER_MODEL = 'users.CustomUser'
 #LOGIN_REDIRECT_URL = '/api/atmp/dashboard/'
 #LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-LOGIN_URL = reverse_lazy('users:login')
+# URL settings for 2FA
+LOGIN_URL = 'two_factor:login'
+#LOGIN_URL = reverse_lazy('users:login')
 LOGIN_REDIRECT_URL = reverse_lazy('atmp_app:dashboard')
 LOGOUT_REDIRECT_URL = reverse_lazy('users:login')
+
+# 2FA options (optional customizations)
+OTP_TOTP_ISSUER = 'ATMP System'
+
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

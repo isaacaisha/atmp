@@ -10,7 +10,7 @@
   <h1 class="h3 mb-0 text-gray-800">{% trans "My ATMP Incidents" %}</h1>
   {% if user.role == 'employee' %}
   <a href="{% url 'atmp_app:incident-create' %}" class="btn btn-sm btn-primary shadow-sm">
-    <i class="fas fa-plus fa-sm text-white-50 me-1"></i> {% trans "Report a New Incident" %}
+    <i class="fas fa-plus fa-sm text-white-50 me-2"></i> {% trans "Report a New Incident" %}
   </a>
   {% endif %}
 </div>
@@ -23,13 +23,27 @@
     </h6>
   </div>
   <div class="card-body">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
+    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+      <table class="table table-hover align-middle table-striped">
         <thead class="table-light">
           <tr>
-            <th scope="col"><i class="fas fa-file-alt me-1"></i>{% trans "Title" %}</th>
-            <th scope="col"><i class="fas fa-calendar-day me-1"></i>{% trans "Date" %}</th>
-            <th scope="col"><i class="fas fa-info-circle me-1"></i>{% trans "Status" %}</th>
+            <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1;">
+              <i class="fas fa-file-alt me-1"></i> {% trans "Title" %}
+            </th>
+            <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1;">
+              <i class="fas fa-calendar-day me-1"></i> {% trans "Date" %}
+            </th>
+            <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
+              <i class="fas fa-info-circle me-1"></i> {% trans "Status" %}
+            </th>
+            {% if user.role == 'employee' %}
+            <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
+              <i class="fa fa-pen-square me-1"></i> {% trans "Edit" %}
+            </th>
+            <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
+              <i class="fa fa-trash me-1"></i> {% trans "Delete" %}
+            </th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
@@ -40,10 +54,24 @@
                 {{ inc.title }}
               </a>
             </td>
-            <td>{{ inc.date_of_incident|date:"F j, Y" }}</td>
-            <td>
-              <span class="badge bg-info text-dark">{{ inc.get_status_display }}</span>
+            <td class="text-nowrap">{{ inc.date_of_incident|date:"j F, Y" }}</td>
+            <td class="text-nowrap">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-info text-dark mb-0">{{ inc.get_status_display }}</span>
+              </div>
             </td>
+            {% if user.role == 'employee' %}
+            <td>
+              <a href="{% url 'atmp_app:incident-update' inc.pk %}" class="text-decoration-none text-warning">
+                <i class="fa fa-pen-square"></i>
+              </a>
+            </td>
+            <td>
+              <a href="{% url 'atmp_app:incident-delete' inc.pk %}" class="text-decoration-none text-danger">
+                <i class="fa fa-trash"></i>
+              </a>
+            </td>
+            {% endif %}
           </tr>
           {% empty %}
           <tr>
@@ -56,5 +84,11 @@
       </table>
     </div>
   </div>
+</div>
+<!-- Back Button -->
+<div class="text-center">
+  <a href="{% url 'atmp_app:dashboard' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-2"></i> {% trans "Back to Dashboard" %}
+  </a>
 </div>
 {% endblock %}

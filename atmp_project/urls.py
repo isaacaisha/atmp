@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.views.generic import RedirectView
+from two_factor.urls import urlpatterns as tf_urls
 from django.conf.urls.static import static
 
 urlpatterns = [
@@ -19,6 +20,9 @@ urlpatterns = [
 
     # 3) Built‑in auth views (login, logout, password reset at /accounts/…)
     path('accounts/', include(('django.contrib.auth.urls', 'accounts'), namespace='accounts')),
+    # 2FA default URLs (login, setup, backup tokens, QR, etc.)
+    #path('account/', include('two_factor.urls', namespace='two_factor')),
+    path('', include(tf_urls)),  # Include 2FA URLs
 
     # 4) Your custom user URLs (register, etc.); still lives under /register/, /login/, etc.
     path('users/', include('users.urls', namespace='users')),
