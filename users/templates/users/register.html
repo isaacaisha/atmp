@@ -60,6 +60,14 @@
                                                 {% trans "Register Account" %}
                                             </button>
                                         </div>
+
+                                        <div class="form__group mb-3">
+                                            <!--{{ form.captcha.label_tag }}-->
+                                            {{ form.captcha }}
+                                            {% for error in form.captcha.errors %}
+                                            <p class="text-danger">{{ error }}</p>
+                                          {% endfor %}
+                                        </div>
                                     </form>
 
                                     <hr>

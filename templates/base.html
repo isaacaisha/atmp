@@ -43,6 +43,11 @@
         <link rel="shortcut icon" type="image/x-icon" href="{% static 'ico/favicon1.ico' %}">
     {% endblock %}
     
+    <!-- Recaptcha V2 -->
+    <!--<script src="https://www.google.com/recaptcha/enterprise.js?render=6Lcfyn0rAAAAAIyqeRN6kBWwYokijnHHbJyjVP2C"></script>-->
+    <!-- Recaptcha V3 -->
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lc4yX0rAAAAABiL7hbZBYisTyJaxg8a95CfEeSl"></script>
+        
 </head>
 
 <body id="page-top">
@@ -133,6 +138,25 @@
     <script src="{% static 'js/demo/chart-area-demo.js' %}"></script>
     <script src="{% static 'js/demo/chart-pie-demo.js' %}"></script>
 
+    <!-- Recaptcha V2 -->
+    <!--<script>
+        function onClick(e) {
+            e.preventDefault();
+            grecaptcha.enterprise.ready(async () => {
+                const token = await grecaptcha.enterprise.execute('6Lcfyn0rAAAAAIyqeRN6kBWwYokijnHHbJyjVP2C', { action: 'LOGIN' });
+            });
+        }
+    </script>-->
+    <!-- Recaptcha V3 -->
+    <script>
+        function onClick(e) {
+            e.preventDefault();
+            grecaptcha.enterprise.ready(async () => {
+            const token = await grecaptcha.enterprise.execute('6Lc4yX0rAAAAABiL7hbZBYisTyJaxg8a95CfEeSl', {action: 'LOGIN'});
+            });
+        }
+    </script>
+    
     {% block extra_js %}{% endblock %}
 
 </body>

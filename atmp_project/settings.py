@@ -102,6 +102,9 @@ INSTALLED_APPS = [
     'two_factor',
     #'two_factor.plugins.phonenumber',
     'two_factor.plugins.email',
+
+    # 4) Recaptcha
+    'django_recaptcha',
 ]
 
 MIDDLEWARE = [
@@ -272,6 +275,13 @@ LOGOUT_REDIRECT_URL = reverse_lazy('users:login')
 
 # 2FA options (optional customizations)
 OTP_TOTP_ISSUER = 'ATMP System'
+
+
+# reCAPTCHA settings for v2 and v3
+RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
+RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
+
+RECAPTCHA_REQUIRED_SCORE = 0.85  # For reCAPTCHA v3
 
 
 REST_FRAMEWORK = {

@@ -10,6 +10,8 @@ from django.contrib.auth.views import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+#from two_factor.views import LoginView as TwoFactorLoginView
+
 from .models import CustomUser
 from .forms import (
     CustomUserCreationForm,
@@ -28,6 +30,10 @@ class RegisterView(CreateView):
 #    template_name = 'users/login.html'
 #    authentication_form = CustomAuthenticationForm
 
+#class CustomLoginView(TwoFactorLoginView):
+#    template_name = 'users/login.html'
+#    authentication_form = CustomAuthenticationForm
+#
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'users/profile.html'
