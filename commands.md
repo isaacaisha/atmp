@@ -64,7 +64,7 @@ docker compose -f docker-compose.prod.yml -p atmp_prod run --rm atmp \
   python manage.py collectstatic --noinput
 
 docker-compose -f docker-compose.prod.yml -p atmp_prod down --volumes --remove-orphans
-docker system prune -a --volumes 
+docker system prune -a --volumes
 docker-compose -f docker-compose.prod.yml -p atmp_prod down -v
 docker-compose -f docker-compose.prod.yml -p atmp_prod up -d --build --remove-orphans
 docker-compose -f docker-compose.prod.yml -p atmp_prod ps
@@ -76,7 +76,7 @@ docker-compose -f docker-compose.prod.yml -p atmp_prod logs -f
 <!-- dev -->
 docker compose -f docker-compose.dev.yml -p atmp_dev run atmp python manage.py collectstatic
 docker-compose -f docker-compose.dev.yml down --volumes --remove-orphans
-docker system prune -a --volumes 
+docker system prune -a --volumes
 docker-compose -f docker-compose.dev.yml -p atmp_dev down -v
 docker-compose -f docker-compose.dev.yml -p atmp_dev up -d --remove-orphans --build
 docker-compose -f docker-compose.dev.yml -p atmp_dev ps
@@ -106,3 +106,5 @@ mkdir -p media/profile_img
 sudo chown -R siisi:siisi media/profile_img
 # Give user and group write permissions, others only read/execute
 chmod -R 755 media/profile_img
+
+# Siret: 918 881 913 00019

@@ -41,6 +41,15 @@
                       {% endfor %}
                     </div>
                     {% endfor %}
+                    
+                    <div class="form__group mb-3">
+                      <label>Recaptcha:</label>
+                      {{ form.captcha }}
+                      <!--<div class="g-recaptcha" data-sitekey="6Lcfyn0rAAAAAIyqeRN6kBWwYokijnHHbJyjVP2C" data-action="LOGIN" data-size="compact"></div>-->
+                      {% for error in form.captcha.errors %}
+                        <p class="text-danger">{{ error }}</p>
+                      {% endfor %}
+                    </div>
 
                     {% if wizard.form.non_field_errors %}
                     <div class="alert alert-danger">
@@ -104,5 +113,6 @@
       </div> <!-- col-lg-12 -->
     </div> <!-- row -->
   </div> <!-- container -->
+  <!--<script src="https://www.google.com/recaptcha/api.js" async defer></script>-->
 </body>
 {% endblock %}

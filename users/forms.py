@@ -61,22 +61,22 @@ class CustomAuthenticationForm(AuthenticationForm):
     # Use reCAPTCHA v2 for login
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(
         attrs={
-            'data-theme': 'dark',
+            #'data-theme': 'dark',
             'data-size': 'compact'
             }
         )
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update({
-            'placeholder': 'Email',
-            'class': 'form-control form-control-user',
-        })
-        self.fields['password'].widget.attrs.update({
-            'placeholder': 'Password',
-            'class': 'form-control form-control-user',
-        })
-        self.fields['captcha'].widget.attrs.update({
-            'class': 'form-control',
-        })
+    #def __init__(self, *args, **kwargs):
+    #    super().__init__(*args, **kwargs)
+    #    self.fields['username'].widget.attrs.update({
+    #        'placeholder': 'Email',
+    #        'class': 'form-control form-control-user',
+    #    })
+    #    self.fields['password'].widget.attrs.update({
+    #        'placeholder': 'Password',
+    #        'class': 'form-control form-control-user',
+    #    })
+    #    self.fields['captcha'].widget.attrs.update({
+    #        'class': 'form-control',
+    #    })

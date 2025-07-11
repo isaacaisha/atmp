@@ -2,6 +2,7 @@
 
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
+from two_factor.views import LoginView as TwoFactorLoginView
 from django.contrib.auth.views import (
     #LoginView, 
     LogoutView,
@@ -9,8 +10,8 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView, PasswordResetCompleteView,
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
-
-#from two_factor.views import LoginView as TwoFactorLoginView
+from django.contrib import messages
+from django.utils.translation import gettext as _
 
 from .models import CustomUser
 from .forms import (
@@ -26,14 +27,29 @@ class RegisterView(CreateView):
     success_url = reverse_lazy('two_factor:login')
 
 
-#class CustomLoginView(LoginView):
-#    template_name = 'users/login.html'
-#    authentication_form = CustomAuthenticationForm
+class CustomLoginView(TwoFactorLoginView):
+    def get_form_list(self):
+        form_list = super().get_form_list()
+        # Override the 'auth' step form with our custom one
+        form_list['auth'] = CustomAuthenticationForm
+        return form_list
 
-#class CustomLoginView(TwoFactorLoginView):
-#    template_name = 'users/login.html'
-#    authentication_form = CustomAuthenticationForm
-#
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form=form, **kwargs)
+
+        # Try to get email/username from form data (prefixed with step name)
+        # form.data is a QueryDict that has all POST data, including the current step's fields
+        email = form.data.get('auth-username') or form.data.get('auth-email') or ''
+
+        if form.errors:
+            print(f"Form errors: {form.errors}")
+            messages.warning(
+                self.request,
+                _('Invalid reCAPTCHA or User email: "{email}" or Password doesn\'t exist 😝').format(email=email)
+            )
+        return context
+
+
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'users/profile.html'
