@@ -1,4 +1,4 @@
-# /home/siisi/atmp/atmp_app/permissions.py
+# /home/siisi/atmp/atmp_api/permissions.py
 
 from rest_framework import permissions
 

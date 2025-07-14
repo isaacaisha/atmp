@@ -30,8 +30,11 @@ urlpatterns = [
     # 5) Dashboard pages under /dashboard/
     path('dashboard/', include('dashboard.urls', namespace='dashboard')),
 
-    # 6) ATMP API
-    path('api/atmp/', include(('atmp_app.urls','atmp_app'), namespace='atmp_app')),
+    # 6) ATMP_APP
+    path('atmp/', include(('atmp_app.urls','atmp_app'), namespace='atmp_app')),
+
+    # 7) ATMP_API
+    path('atmp/api/', include(('atmp_api.urls','atmp_api'), namespace='atmp_api')),
 ]
 
 if settings.DEBUG:

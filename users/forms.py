@@ -2,8 +2,6 @@
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-
-# Import ReCaptchaField correctly
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox, ReCaptchaV3
 
@@ -66,17 +64,4 @@ class CustomAuthenticationForm(AuthenticationForm):
             }
         )
     )
-
-    #def __init__(self, *args, **kwargs):
-    #    super().__init__(*args, **kwargs)
-    #    self.fields['username'].widget.attrs.update({
-    #        'placeholder': 'Email',
-    #        'class': 'form-control form-control-user',
-    #    })
-    #    self.fields['password'].widget.attrs.update({
-    #        'placeholder': 'Password',
-    #        'class': 'form-control form-control-user',
-    #    })
-    #    self.fields['captcha'].widget.attrs.update({
-    #        'class': 'form-control',
-    #    })
+    

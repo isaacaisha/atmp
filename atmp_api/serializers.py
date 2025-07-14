@@ -1,7 +1,7 @@
-# /home/siisi/atmp/atmp_app/serializers.py
+# /home/siisi/atmp/atmp_api/serializers.py
 
 from rest_framework import serializers
-from .models import ATMPIncident, ATMPDocument
+from atmp_app.models import ATMPIncident, ATMPDocument
 
 
 class ATMPDocumentSerializer(serializers.ModelSerializer):

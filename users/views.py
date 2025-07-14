@@ -4,7 +4,6 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from two_factor.views import LoginView as TwoFactorLoginView
 from django.contrib.auth.views import (
-    #LoginView, 
     LogoutView,
     PasswordResetView, PasswordResetDoneView,
     PasswordResetConfirmView, PasswordResetCompleteView,
@@ -23,7 +22,6 @@ from .forms import (
 class RegisterView(CreateView):
     template_name = 'users/register.html'
     form_class = CustomUserCreationForm
-    #success_url = reverse_lazy('users:login')
     success_url = reverse_lazy('two_factor:login')
 
 

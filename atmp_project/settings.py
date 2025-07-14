@@ -33,10 +33,12 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
 ]
+# --- CORS Settings ---
 CORS_ALLOWED_ORIGINS = [
     'https://atmp.siisi.online',
     'https://www.atmp.siisi.online',
 ]
+CORS_ALLOW_CREDENTIALS = True # If your frontend sends cookies/auth headers
 
 # Proxy support
 PROXY = {
@@ -45,7 +47,7 @@ PROXY = {
 }
 
 # Admins (for 500 error notifications)
-ADMINS = [('Medusa', 'medusadbt@gmail.com')]
+#ADMINS = [('Medusa', 'medusadbt@gmail.com')]
 
 # SSL & Security settings
 if not DEBUG:
@@ -87,6 +89,7 @@ INSTALLED_APPS = [
     'users',
     'dashboard',
     'atmp_app',
+    'atmp_api',
 
     'whitenoise.runserver_nostatic',  # for using WhiteNoise
 
@@ -109,7 +112,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django_otp.middleware.OTPMiddleware',
@@ -164,6 +167,17 @@ DATABASES = {
         conn_max_age=600,
         ssl_require=os.getenv('DB_SSL_REQUIRE', 'False').lower() == 'true'
     )
+}
+
+# -----------------------------------------------------------------------------
+# Django REST framework
+# -----------------------------------------------------------------------------
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20
 }
 
 # -----------------------------------------------------------------------------
@@ -259,8 +273,6 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     
 
-CORS_ALLOW_CREDENTIALS = True
-
 AUTH_USER_MODEL = 'users.CustomUser'
 
 #LOGIN_URL = '/accounts/login/'
@@ -281,14 +293,5 @@ OTP_TOTP_ISSUER = 'ATMP System'
 RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
 RECAPTCHA_REQUIRED_SCORE = 0.85  # For reCAPTCHA v3
-
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20
-}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

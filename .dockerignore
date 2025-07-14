@@ -6,6 +6,7 @@
 !atmp_project/
 !users/
 !atmp_app/
+!atmp_api/
 !dashboard/
 !templates/
 !static/

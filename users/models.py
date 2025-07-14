@@ -1,5 +1,4 @@
 # /home/siisi/atmp/users/models.py
-
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django_otp import user_has_device
