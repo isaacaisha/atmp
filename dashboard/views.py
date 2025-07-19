@@ -1,6 +1,13 @@
 # /home/siisi/atmp/dashboard/views.py
 
 from django.views.generic import TemplateView
+from django.shortcuts import render
+
+def custom_permission_denied_view(request, exception=None):
+    return render(request, 'dashboard/403.html', status=403)
+
+def custom_page_not_found_view(request, exception=None):
+    return render(request, 'dashboard/404.html', status=404)
 
 
 class CardsView(TemplateView):
@@ -18,8 +25,11 @@ class ButtonsView(TemplateView):
 class BlankPageView(TemplateView):
     template_name = 'dashboard/blank.html'
 
-class Error404View(TemplateView):
+class Error403View(TemplateView):
     # You generally set this in handler404, but if you want a standalone:
+    template_name = 'dashboard/403.html'
+
+class Error404View(TemplateView):
     template_name = 'dashboard/404.html'
 
 class UtilitiesColorView(TemplateView):

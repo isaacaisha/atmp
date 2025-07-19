@@ -1,4 +1,4 @@
-# /home/siisi/atmp/atmp_api/auth_views.py
+# /home/siisi/atmp/atmp_app/auth_views.py
 
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django_otp import devices_for_user
@@ -55,10 +55,10 @@ class AuthViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         Return reverse links to all available auth-related endpoints.
         """
         return Response({
-            'register': reverse('atmp_api:api:auth-register', request=request),
-            'login':    reverse('atmp_api:api:auth-login',    request=request),
-            'profile':  reverse('atmp_api:api:auth-profile',  request=request),
-            'logout':   reverse('atmp_api:api:auth-logout',   request=request),
+            'register': reverse('atmp_app:auth-register', request=request),
+            'login':    reverse('atmp_app:auth-login',    request=request),
+            'profile':  reverse('atmp_app:auth-profile',  request=request),
+            'logout':   reverse('atmp_app:auth-logout',   request=request),
         })
 
     @action(detail=False, methods=['get', 'post'], url_path='register', permission_classes=[])

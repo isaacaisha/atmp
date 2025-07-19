@@ -9,7 +9,7 @@ services:
     environment:
       - ENVIRONMENT=dev
     volumes:
-      - dbt_data_dev:/var/lib/postgresql/data
+      - atmp_data_dev:/var/lib/postgresql/data
 
   atmp:
     build:
@@ -32,4 +32,4 @@ services:
       - ENVIRONMENT=dev
 
 volumes:
-  dbt_data_dev:
+  atmp_data_dev:

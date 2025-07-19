@@ -7,6 +7,9 @@ from django.views.generic import RedirectView
 from two_factor.urls import urlpatterns as tf_urls
 from django.conf.urls.static import static
 
+handler403 = 'dashboard.views.custom_permission_denied_view'
+handler404 = 'dashboard.views.custom_page_not_found_view'
+
 urlpatterns = [
     # 1) Root URL (“/”) → redirect to the dashboard URL by its name
     path(
@@ -33,8 +36,8 @@ urlpatterns = [
     # 6) ATMP_APP
     path('atmp/', include(('atmp_app.urls','atmp_app'), namespace='atmp_app')),
 
-    # 7) ATMP_API
-    path('atmp/api/', include(('atmp_api.urls','atmp_api'), namespace='atmp_api')),
+    # Serve favicon.ico
+    path('favicon.ico', RedirectView.as_view(url='/static/ico/favicon_api.ico', permanent=True)),
 ]
 
 if settings.DEBUG:

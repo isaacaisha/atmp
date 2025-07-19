@@ -89,7 +89,6 @@ INSTALLED_APPS = [
     'users',
     'dashboard',
     'atmp_app',
-    'atmp_api',
 
     'whitenoise.runserver_nostatic',  # for using WhiteNoise
 
@@ -146,6 +145,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'atmp_project.wsgi.application'
 
+# -----------------------------------------------------------------------------
+# Database
+# -----------------------------------------------------------------------------
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=os.getenv('DB_SSL_REQUIRE', 'False').lower() == 'true'
+    )
+}
 
 ## Database
 ## https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -157,17 +166,6 @@ WSGI_APPLICATION = 'atmp_project.wsgi.application'
 #}
 #}
 
-
-# -----------------------------------------------------------------------------
-# Database
-# -----------------------------------------------------------------------------
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=os.getenv('DB_SSL_REQUIRE', 'False').lower() == 'true'
-    )
-}
 
 # -----------------------------------------------------------------------------
 # Django REST framework
@@ -189,6 +187,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
+
+AUTH_USER_MODEL = 'users.CustomUser'
 
 # -----------------------------------------------------------------------------
 # Internationalization
@@ -272,8 +272,6 @@ if not DEBUG:
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     
-
-AUTH_USER_MODEL = 'users.CustomUser'
 
 #LOGIN_URL = '/accounts/login/'
 #LOGIN_REDIRECT_URL = '/api/atmp/dashboard/'

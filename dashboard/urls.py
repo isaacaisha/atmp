@@ -11,6 +11,7 @@ urlpatterns = [
     path('charts/',              views.ChartsView.as_view(),            name='charts'),
     path('tables/',              views.TablesView.as_view(),            name='tables'),
     path('buttons/',             views.ButtonsView.as_view(),           name='buttons'),
+    path('403/',                 views.Error403View.as_view(),          name='page_403'),
     path('404/',                 views.Error404View.as_view(),          name='page_404'),
     path('blank/',               views.BlankPageView.as_view(),         name='blank_page'),
     path('utilities/colors/',    views.UtilitiesColorView.as_view(),    name='utilities_color'),

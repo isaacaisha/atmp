@@ -4,15 +4,15 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import EmailMessage
 from django.conf import settings
-from .models import ATMPIncident
+from .models import DossierATMP
 
 
-@receiver(post_save, sender=ATMPIncident)
+@receiver(post_save, sender=DossierATMP)
 def notify_syndic(sender, instance, created, **kwargs):
     if created:
         subject = f"New ATMP Incident: {instance.title}"
         message = f"""
-        New incident reported by {instance.provider.get_full_name()} ({instance.provider.email})
+        New incident reported by {instance.created_by.get_full_name()} ({instance.created_by.email})
         
         Details:
         Title: {instance.title}
@@ -29,8 +29,8 @@ def notify_syndic(sender, instance, created, **kwargs):
         if instance.safety_manager and instance.safety_manager.email:
             recipients.append(instance.safety_manager.email)
 
-        if instance.provider and instance.provider.email:
-            recipients.append(instance.provider.email)
+        if instance.created_by and instance.created_by.email:
+            recipients.append(instance.created_by.email)
 
         # Add any static emails if needed
         recipients.extend(['medusadbt@gmail.com', 'charikajadida@gmail.com'])

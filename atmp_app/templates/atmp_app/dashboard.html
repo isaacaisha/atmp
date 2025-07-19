@@ -10,7 +10,7 @@
                 <div class="container-fluid">
                 
                     {% if user.is_authenticated %}
-                    {% if user.role != 'employee' %}
+                    {% if user.role != 'employee' and not user.is_superuser %}
                     <!-- Only My Incidents Card – Center it -->
                     <div class="row justify-content-center">
                         <div class="col-xl-6 col-md-6 mb-4">
@@ -37,7 +37,7 @@
                                     </div>
                                 </div>
                 
-                                {% if user.role == 'employee' %}
+                                {% if user.role == 'employee' or user.is_superuser %}
                                 <!-- Report Incident Card -->
                                 <div class="col-xl-6 col-md-6 mb-4">
                                     <div class="card border-left-success shadow h-100 py-2">

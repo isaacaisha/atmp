@@ -1,0 +1,21 @@
+<!-- /home/siisi/atmp/dashboard/templates/dashboard/403.html -->
+
+{% extends "base.html" %}
+{% load static i18n %}
+{% block title %}403{% endblock %}
+
+{% block content %}
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+    <!-- 404 Error Text -->
+    <div class="text-center">
+        <div class="error mx-auto" data-text="403">403</div>
+        <p class="lead text-gray-800 mb-5">{% trans 'Access Denied' %}</p>
+        <p class="text-gray-500 mb-0">{% trans "You don't have permission to view this incident." %}</p>
+        <a href="{% url 'atmp_app:dashboard' %}">&larr; {% trans 'Back to Dashboard' %}</a>
+    </div>
+
+</div>
+<!-- /.container-fluid -->
+{% endblock %}

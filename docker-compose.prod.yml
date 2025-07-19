@@ -9,7 +9,7 @@ services:
     environment:
       - ENVIRONMENT=prod
     volumes:
-      - dbt_data_prod:/var/lib/postgresql/data
+      - atmp_data_prod:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s
@@ -36,4 +36,4 @@ services:
       - ./staticfiles:/app/staticfiles
 
 volumes:
-  dbt_data_prod: {}
+  atmp_data_prod: {}

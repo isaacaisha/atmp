@@ -108,3 +108,74 @@ sudo chown -R siisi:siisi media/profile_img
 chmod -R 755 media/profile_img
 
 # Siret: 918 881 913 00019
+
+
+# For a New DossierATMP
+{
+  "created_by": 9,
+  "safety_manager": 8,
+  "title": "Chute dans l’atelier de peinture",
+  "description": "L’employé a glissé sur une flaque d’huile près de la cabine de peinture.",
+  "date_of_incident": "2025-07-18",
+  "location": "Usine de peinture, Quai 4, Zone industrielle",
+  "status": "A_ANALYSER",
+  "entreprise": {
+    "nom": "Peintures & Co",
+    "adresse": "12 rue des Arts, 75005 Paris",
+    "siret": "123 456 789 00010"
+  },
+  "salarie": {
+    "nom": "Dupont",
+    "prenom": "Jean",
+    "matricule": "EMP-0456",
+    "poste": "Opérateur cabine"
+  },
+  "accident": {
+    "type": "Glissade",
+    "gravite": "Mineure",
+    "description_details": "Talon glissé sur une tâche d’huile non signalée."
+  },
+  "temoins": [
+    {
+      "nom": "Martin",
+      "prenom": "Julie",
+      "contact": "julie.martin@example.com"
+    }
+  ],
+  "tiers_implique": [
+    {
+      "nom": "Fournisseur PeintureX",
+      "role": "Intervenant externe"
+    }
+  ],
+  "service_sante": "Clinique du Travail, Dr. Lambert",
+  "documents": []
+}
+
+
+# For a New Contentieux Record
+{
+  "dossier_atmp": 1,
+  "reference": "CONT-1626742800",
+  "subject": {
+    "objet": "Contestation de la décision CPAM"
+  },
+  "juridiction_steps": {
+    "etape1": "Cour d'appel",
+    "etape2": "Cour de cassation"
+  },
+  "status": "DRAFT",
+  "documents": [],
+  "actions": []
+}
+
+
+# For a New Audit Record
+{
+  "dossier_atmp": 1,
+  "auditor": 2,
+  "checklist": ["item A"],
+  "status": "NOT_STARTED",
+  "decision": "DO_NOT_CONTEST",
+  "comments": "Kickoff audit today."
+}

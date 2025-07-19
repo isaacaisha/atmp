@@ -1,4 +1,4 @@
-# /home/siisi/atmp/atmp_api/auth_serializers.py
+# /home/siisi/atmp/atmp_app/auth_serializers.py
 
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
@@ -39,7 +39,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["email", "name", "role", "has_2fa"]
+        fields = ["id", "email", "name", "role", "has_2fa"]
 
     def get_has_2fa(self, user):
         return bool(TOTPDevice.objects.filter(user=user, confirmed=True))
