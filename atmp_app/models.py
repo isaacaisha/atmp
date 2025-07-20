@@ -1,5 +1,6 @@
 # /atmp/atmp_app/models.py
 
+import uuid
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -80,7 +81,8 @@ class Action(models.Model):
 
 
 class Document(models.Model):
-    contentieux = models.ForeignKey('Contentieux', on_delete=models.CASCADE, related_name='document_set')
+    #contentieux = models.ForeignKey('Contentieux', on_delete=models.CASCADE, related_name='document_set')
+    contentieux = models.ForeignKey('Contentieux', on_delete=models.CASCADE, related_name='document_set', null=True, blank=True)
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='uploaded_documents')
     document_type = models.CharField(max_length=50, choices=DocumentType.choices)
     original_name = models.CharField(max_length=255)
@@ -121,7 +123,7 @@ class UploadedFile(models.Model):
 
 
 class DossierATMP(models.Model):
-    reference = models.CharField(max_length=255, unique=True)
+    reference = models.CharField(max_length=255, unique=True, blank=True)
     safety_manager = models.ForeignKey(User, on_delete=models.PROTECT, related_name='managed_dossiers')
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -130,12 +132,13 @@ class DossierATMP(models.Model):
     status = models.CharField(max_length=50, choices=DossierStatus.choices)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_dossiers')
 
-    entreprise = models.JSONField()
-    salarie = models.JSONField()
-    accident = models.JSONField()
-    temoins = models.JSONField(default=list)
+
+    entreprise = models.JSONField(blank=True, null=True)
+    salarie = models.JSONField(blank=True, null=True)
+    accident = models.JSONField(blank=True, null=True)
+    temoins = models.JSONField(default=list, blank=True, null=True) # default=list is good, but also needs null=True
     tiers_implique = models.JSONField(blank=True, null=True)
-    service_sante = models.CharField(max_length=255, blank=True, null=True)
+    service_sante = models.CharField(max_length=255, blank=True, null=True) # already null=True
 
     documents = models.ManyToManyField(Document, related_name='dossier_atmp_documents', blank=True)
 
@@ -146,6 +149,27 @@ class DossierATMP(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Dossier AT/MP'
         verbose_name_plural = 'Dossiers AT/MP'
+
+    def save(self, *args, **kwargs):
+        if not self.reference:
+            # Generate a unique reference if it's not set
+            self.reference = f"ATMP-{timezone.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:8].upper()}"
+
+        # === IMPORTANT: Re-add the logic to convert empty dicts/lists to None ===
+        # This is crucial because your forms might return {} or [] for empty sub-forms,
+        # and you want to store NULL in the DB if they are truly empty.
+        if self.entreprise == {}:
+            self.entreprise = None
+        if self.salarie == {}:
+            self.salarie = None
+        if self.accident == {}:
+            self.accident = None
+        if self.temoins == []: # If you want an empty list to be stored as NULL
+            self.temoins = None
+        if self.tiers_implique == {}: # If tiers_implique can also be an empty dict
+            self.tiers_implique = None
+            
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.reference

@@ -12,6 +12,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.utils.translation import gettext as _
 
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
+
 from .models import CustomUser
 from .forms import (
     CustomUserCreationForm,
@@ -35,6 +38,12 @@ class CustomLoginView(TwoFactorLoginView):
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form=form, **kwargs)
 
+        # Always include captcha in context
+        if 'captcha' not in context:
+            context['captcha'] = ReCaptchaField(widget=ReCaptchaV2Checkbox(
+                attrs={'data-size': 'compact'}
+            ))
+            
         # Try to get email/username from form data (prefixed with step name)
         # form.data is a QueryDict that has all POST data, including the current step's fields
         email = form.data.get('auth-username') or form.data.get('auth-email') or ''

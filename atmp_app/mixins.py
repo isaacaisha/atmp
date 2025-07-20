@@ -28,6 +28,8 @@ ATMP Permission System Flow:
 
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 
+from users.models import UserRole
+
 
 class ProviderOrSuperuserMixin(LoginRequiredMixin, UserPassesTestMixin):
     """Allows both employees and superusers"""

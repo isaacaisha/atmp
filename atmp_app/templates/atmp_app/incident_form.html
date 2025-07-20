@@ -6,12 +6,10 @@
 {% block title %}{% trans "Report Incident" %}{% endblock %}
 
 {% block content %}
-<!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">{% trans "New ATMP Incident" %}</h1>
 </div>
 
-<!-- Card -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">{% trans "Incident Reporting Form" %}</h6>
@@ -35,12 +33,26 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.document_type.id_for_label }}" class="form-label">{% trans "Document Type" %}</label>
+                    {{ form.document_type|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.document_type.errors }}</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">{% trans "Status" %}</label>
+                    {{ form.status|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.status.errors }}</div>
+                </div>
+            </div>
+
             <div class="mb-3">
-                <label for="{{ form.description.id_for_label }}" class="form-label">{% trans "Description" %}</label>
+                <label for="{{ form.description.id_for_label }}" class="form-label">{% trans "Incident Description" %}</label>
                 {{ form.description|add_class:"form-control" }}
                 <div class="text-danger small">{{ form.description.errors }}</div>
             </div>
-
+            
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="{{ form.date_of_incident.id_for_label }}" class="form-label">{% trans "Date of Incident" %}</label>
@@ -55,29 +67,96 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="{{ form.status.id_for_label }}" class="form-label">{% trans "Status" %}</label>
-                    {{ form.status|add_class:"form-control" }}
-                    <div class="text-danger small">{{ form.status.errors }}</div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="{{ form.file.id_for_label }}" class="form-label">{% trans "Attach file" %}</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-paperclip"></i></span>
-                        {{ form.file|add_class:"form-control" }}
+            <div class="mb-4">
+                <h5 class="mt-4 mb-3 text-primary">{% trans "Company Details" %}</h5>
+                {{ form.entreprise_form.non_field_errors }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.entreprise_form.name.id_for_label }}" class="form-label">{% trans "Company Name" %}</label>
+                        {{ form.entreprise_form.name|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.entreprise_form.name.errors }}</div>
                     </div>
-                    <div class="text-danger small">{{ form.file.errors }}</div>
-                </div>
-                <div class="form-text small text-muted">
-                    {% trans "Allowed: PDF, DOC, JPG, PNG (max 10MB)" %}
-                </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.entreprise_form.address.id_for_label }}" class="form-label">{% trans "Company Address" %}</label>
+                        {{ form.entreprise_form.address|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.entreprise_form.address.errors }}</div>
+                    </div>
+                     <div class="col-md-6 mb-3">
+                        <label for="{{ form.entreprise_form.siret.id_for_label }}" class="form-label">{% trans "SIRET Number" %}</label>
+                        {{ form.entreprise_form.siret|add_class:"form-control" }}
+                        <div class="form-text text-muted">{{ form.entreprise_form.siret.help_text }}</div>
+                        <div class="text-danger small">{{ form.entreprise_form.siret.errors }}</div>
+                    </div>
+                    </div>
             </div>
 
+            <div class="mb-4">
+                <h5 class="mt-4 mb-3 text-primary">{% trans "Employee Details" %}</h5>
+                {{ form.salarie_form.non_field_errors }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.salarie_form.first_name.id_for_label }}" class="form-label">{% trans "First Name" %}</label>
+                        {{ form.salarie_form.first_name|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.salarie_form.first_name.errors }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.salarie_form.last_name.id_for_label }}" class="form-label">{% trans "Last Name" %}</label>
+                        {{ form.salarie_form.last_name|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.salarie_form.last_name.errors }}</div>
+                    </div>
+                     <div class="col-md-6 mb-3">
+                        <label for="{{ form.salarie_form.date_of_birth.id_for_label }}" class="form-label">{% trans "Date of Birth" %}</label>
+                        {{ form.salarie_form.date_of_birth|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.salarie_form.date_of_birth.errors }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.salarie_form.job_title.id_for_label }}" class="form-label">{% trans "Job Title" %}</label>
+                        {{ form.salarie_form.job_title|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.salarie_form.job_title.errors }}</div>
+                    </div>
+                    </div>
+            </div>
+
+            <div class="mb-4">
+                <h5 class="mt-4 mb-3 text-primary">{% trans "Accident Details" %}</h5>
+                {{ form.accident_form.non_field_errors }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.accident_form.type_of_accident.id_for_label }}" class="form-label">{% trans "Type of Accident" %}</label>
+                        {{ form.accident_form.type_of_accident|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.accident_form.type_of_accident.errors }}</div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="{{ form.accident_form.detailed_circumstances.id_for_label }}" class="form-label">{% trans "Detailed Circumstances" %}</label>
+                        {{ form.accident_form.detailed_circumstances|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.accident_form.detailed_circumstances.errors }}</div>
+                    </div>
+                    </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.uploaded_file.id_for_label }}" class="form-label">{% trans "Attach File" %}</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-paperclip"></i></span>
+                        {{ form.uploaded_file|add_class:"form-control" }}
+                    </div>
+                    <div class="text-danger small">{{ form.uploaded_file.errors }}</div>
+                    <div class="form-text small text-muted">
+                        {% trans "Allowed: PDF, DOC, JPG, PNG (max 10MB)" %}
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3"">
+                    <label for="{{ form.document_description.id_for_label }}" class="form-label">{% trans "File Description" %}</label>
+                    {{ form.document_description|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.document_description.errors }}</div>
+                </div>
+            </div>
+            
             <div class="d-flex justify-content-between gap-3 mt-3">
                 <div>
-                    <a href="{% url 'atmp_app:dashboard' %}" class="btn btn-outline-secondary">
+                    <a href="{% url 'atmp_app:dashboard' %}" class="btn btn-outline-secondary"
+                        onclick="window.history.back(); return false;">
                         <i class="fas fa-arrow-left me-2"></i> {% trans 'Cancel' %}
                     </a>
                 </div>

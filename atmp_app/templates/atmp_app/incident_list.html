@@ -8,7 +8,7 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
   <h1 class="h3 mb-0 text-gray-800">{% trans "My ATMP Incidents" %}</h1>
-  {% if user.role == 'employee' %}
+  {% if user.role == user.is_superuser or 'employee' %}
   <a href="{% url 'atmp_app:incident-create' %}" class="btn btn-sm btn-primary shadow-sm">
     <i class="fas fa-plus fa-sm text-white-50 me-2"></i> {% trans "Report a New Incident" %}
   </a>
@@ -36,8 +36,8 @@
             <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
               <i class="fas fa-info-circle me-1"></i> {% trans "Status" %}
             </th>
-            {% if user.role == 'employee' %}
-            <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
+            {% if user.role == user.is_superuser or 'employee' %}
+            <th scope="col" style="position: sticky; top: 0; z-index: 1; white-space: nowrap;">
               <i class="fa fa-pen-square me-1"></i> {% trans "Edit" %}
             </th>
             <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
@@ -60,7 +60,7 @@
                 <span class="badge bg-info text-dark mb-0">{{ inc.get_status_display }}</span>
               </div>
             </td>
-            {% if user.role == 'employee' %}
+            {% if user.role == user.is_superuser or 'employee' %}
             <td>
               <a href="{% url 'atmp_app:incident-update' inc.pk %}" class="text-decoration-none text-warning">
                 <i class="fa fa-pen-square"></i>
@@ -87,8 +87,9 @@
 </div>
 <!-- Back Button -->
 <div class="text-center">
-  <a href="{% url 'atmp_app:dashboard' %}" class="btn btn-outline-secondary">
-    <i class="fas fa-arrow-left me-2"></i> {% trans "Back to Dashboard" %}
+  <a href="{% url 'atmp_app:dashboard' %}" class="btn btn-outline-secondary"
+    onclick="window.history.back(); return false;">
+    <i class="fas fa-arrow-left me-2"></i> {% trans "Go Back" %}
   </a>
 </div>
 {% endblock %}
