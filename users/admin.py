@@ -5,6 +5,12 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from .models import CustomUser
 
+from atmp_app.models import Action
+
+
+## ───────────────────────────────
+## Custom User Admin
+## ───────────────────────────────
 @admin.register(CustomUser)
 class UserAdmin(BaseUserAdmin):
     """Admin for CustomUser adding role, name, and improved layout."""

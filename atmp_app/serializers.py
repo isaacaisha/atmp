@@ -1,113 +1,24 @@
 # /home/siisi/atmp/atmp_app/serializers.py
 
-import bcrypt
 from rest_framework import serializers
-from django import forms 
+from django.contrib.auth import get_user_model # <--- Get Django's active User model
 from .models import (
-    Audit, Contentieux, Document, DossierATMP, Action,
-    AuditDecision, AuditStatus, ContentieuxStatus, JuridictionType,
-    DocumentType, DossierStatus, UserRole
+    DossierATMP, Contentieux, Audit, Document, 
+    JuridictionStep, Temoin, Tiers, Action, UploadedFile,
+    AuditDecision, AuditStatus, ContentieuxStatus,
+    JuridictionType, DocumentType, DossierStatus, AuditChecklistItem
 )
 from users.models import CustomUser
 
-# --- Serializers for nested JSONFields (if you want more structured validation/representation) ---
-class AuditChecklistItemSerializer(serializers.Serializer):
-    question = serializers.CharField(max_length=255)
-    answer = serializers.BooleanField(required=False, allow_null=True)
-    comment = serializers.CharField(max_length=1000, required=False, allow_blank=True)
-    documentRequired = serializers.BooleanField(required=False)
-    documentReceived = serializers.BooleanField(required=False)
+User = get_user_model() # Get the actual User model defined in settings.AUTH_USER_MODEL
 
-class JuridictionStepSerializer(serializers.Serializer):
-    juridiction = serializers.ChoiceField(choices=JuridictionType.choices())
-    submittedAt = serializers.DateTimeField()
-    decision = serializers.CharField(required=False, allow_blank=True)
-    decisionAt = serializers.DateTimeField(required=False, allow_null=True)
-    notes = serializers.CharField(max_length=1000, required=False, allow_blank=True)
 
-class TemoinSerializer(serializers.Serializer):
-    nom = serializers.CharField(max_length=255)
-    coordonnees = serializers.CharField(max_length=255, required=False, allow_blank=True)
-
-class TiersSerializer(serializers.Serializer):
-    nom = serializers.CharField(max_length=255, required=False, allow_blank=True)
-    adresse = serializers.CharField(max_length=255, required=False, allow_blank=True)
-    assurance = serializers.CharField(max_length=255, required=False, allow_blank=True)
-    immatriculation = serializers.CharField(max_length=255, required=False, allow_blank=True)
-
-# --- Main Model Serializers ---
-class DocumentSerializer(serializers.ModelSerializer):
-    # For ForeignKey fields, use PrimaryKeyRelatedField to represent by ID
-    contentieux = serializers.PrimaryKeyRelatedField(queryset=Contentieux.objects.all())
-    uploaded_by = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
-    
-    # For FileField, Django REST Framework handles file uploads automatically
-    # The 'file' field will be handled by MultiPartParser in views
-
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Document
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'role', 'first_name', 'last_name']
+        read_only_fields = ['id', 'username', 'email', 'role']
 
-class ContentieuxSerializer(serializers.ModelSerializer):
-    dossier_atmp = serializers.PrimaryKeyRelatedField(queryset=DossierATMP.objects.all())
-    
-    # JSONField will be serialized as Python dicts/lists
-    subject = serializers.JSONField()
-    juridiction_steps = serializers.JSONField()
-
-    # For ManyToManyField, use PrimaryKeyRelatedField to represent by IDs
-    documents = serializers.PrimaryKeyRelatedField(many=True, queryset=Document.objects.all(), required=False)
-    actions = serializers.PrimaryKeyRelatedField(many=True, queryset=Action.objects.all(), required=False)
-
-    class Meta:
-        model = Contentieux
-        fields = '__all__'
-        read_only_fields = ['id', 'reference', 'created_at', 'updated_at']
-
-        
-class DossierATMPSerializer(serializers.ModelSerializer):
-    created_by = serializers.PrimaryKeyRelatedField(
-        queryset=CustomUser.objects.all(),
-        style={'input_type': 'select'}
-    )
-    
-    # JSON fields with proper widget definitions
-    entreprise = serializers.JSONField(
-        style={
-            'base_template': 'textarea.html',
-            'rows': 10,
-            'placeholder': '{"nom": "", "siret": "", "adresse": ""}'
-        }
-    )
-    
-    documents = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Document.objects.all(),
-        required=False,
-        style={
-            'base_template': 'select_multiple.html',
-            'input_type': 'select'
-        }
-    )
-    
-    class Meta:
-        model = DossierATMP
-        fields = '__all__'
-        read_only_fields = ['id', 'reference', 'created_at', 'updated_at']
-
-
-class AuditSerializer(serializers.ModelSerializer):
-    dossier_atmp = serializers.PrimaryKeyRelatedField(queryset=DossierATMP.objects.all())
-    auditor = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False, allow_null=True)
-    
-    # JSONField for checklist
-    checklist = serializers.JSONField()
-
-    class Meta:
-        model = Audit
-        fields = '__all__'
-        read_only_fields = ['id', 'started_at', 'completed_at', 'created_at', 'updated_at']
 
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -116,41 +27,220 @@ class ActionSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 
+class DocumentSerializer(serializers.ModelSerializer):
+    uploaded_by = CustomUserSerializer(read_only=True)
+    document_type_display = serializers.CharField(
+        source='get_document_type_display', 
+        read_only=True
+    )
 
-#
-#from rest_framework import serializers
-#from .models import ATMPIncident, ATMPDocument
-#
-#
-#class ATMPDocumentSerializer(serializers.ModelSerializer):
-#    uploaded_by_email = serializers.SerializerMethodField()
-#    
-#    class Meta:
-#        model = ATMPDocument
-#        fields = ['id', 'file', 'description', 'uploaded_at', 'uploaded_by_email']
-#        read_only_fields = ['uploaded_at', 'uploaded_by_email']
-#    
-#    def get_uploaded_by_email(self, obj):
-#        return obj.uploaded_by.email
-#
-#
-#class ATMPIncidentSerializer(serializers.ModelSerializer):
-#    documents = ATMPDocumentSerializer(many=True, read_only=True)
-#    provider_email = serializers.SerializerMethodField()
-#    safety_manager_email = serializers.SerializerMethodField()
-#    
-#    class Meta:
-#        model = ATMPIncident
-#        fields = [
-#            'id', 'provider', 'provider_email', 'safety_manager', 'safety_manager_email',
-#            'title', 'description', 'date_of_incident', 'location',
-#            'status', 'created_at', 'documents'
-#        ]
-#        read_only_fields = ['created_at', 'provider_email', 'safety_manager_email']
-#    
-#    def get_provider_email(self, obj):
-#        return obj.provider.email
-#    
-#    def get_safety_manager_email(self, obj):
-#        return obj.safety_manager.email
-#
+    class Meta:
+        model = Document
+        fields = [
+            'id', 'contentieux', 'uploaded_by', 'document_type', 
+            'document_type_display', 'original_name', 'file', 
+            'mime_type', 'size', 'created_at'
+        ]
+        read_only_fields = ['mime_type', 'size', 'created_at', 'uploaded_by']
+        extra_kwargs = {
+            'file': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        # Automatically set uploaded_by to current user
+        validated_data['uploaded_by'] = self.context['request'].user
+        
+        # Set file properties
+        file = validated_data.get('file')
+        if file:
+            validated_data['mime_type'] = file.content_type
+            validated_data['size'] = file.size
+            validated_data['original_name'] = file.name
+            
+        return super().create(validated_data)
+
+
+class JuridictionStepSerializer(serializers.ModelSerializer):
+    juridiction_display = serializers.CharField(
+        source='get_juridiction_display', 
+        read_only=True
+    )
+    decision_display = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = JuridictionStep
+        fields = [
+            'id', 'contentieux', 'juridiction', 'juridiction_display',
+            'submitted_at', 'decision', 'decision_display',
+            'decision_at', 'notes'
+        ]
+
+    def get_decision_display(self, obj):
+        if obj.decision:
+            return dict(JuridictionStep._meta.get_field('decision').choices)[obj.decision]
+        return None
+
+
+class ContentieuxSerializer(serializers.ModelSerializer):
+    status_display = serializers.CharField(
+        source='get_status_display', 
+        read_only=True
+    )
+    documents = DocumentSerializer(many=True, read_only=True)
+    juridiction_steps = JuridictionStepSerializer(many=True, read_only=True)
+    actions = ActionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Contentieux
+        fields = [
+            'id', 'dossier_atmp', 'reference', 'subject', 'status', 'status_display',
+            'documents', 'juridiction_steps', 'actions', 'created_at'
+        ]
+        read_only_fields = ['reference', 'created_at']
+
+
+class ContentieuxCreateSerializer(ContentieuxSerializer):
+    dossier_atmp = serializers.PrimaryKeyRelatedField(
+        queryset=DossierATMP.objects.all()
+    )
+
+
+class AuditSerializer(serializers.ModelSerializer):
+    status_display = serializers.CharField(
+        source='get_status_display', 
+        read_only=True
+    )
+    decision_display = serializers.CharField(
+        source='get_decision_display', 
+        read_only=True
+    )
+    auditor = CustomUserSerializer(read_only=True)
+
+    class Meta:
+        model = Audit
+        fields = [
+            'id', 'dossier_atmp', 'auditor', 'status', 'status_display',
+            'decision', 'decision_display', 'comments', 'started_at',
+            'completed_at', 'created_at'
+        ]
+        read_only_fields = ['started_at', 'completed_at', 'created_at']
+
+
+class AuditUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Audit
+        fields = ['status', 'decision', 'comments']
+
+
+class AuditChecklistItemSerializer(serializers.Serializer):
+    question = serializers.CharField(max_length=255)
+    answer = serializers.BooleanField(required=False, allow_null=True)
+    comment = serializers.CharField(max_length=1000, required=False, allow_blank=True)
+    documentRequired = serializers.BooleanField(required=False)
+    documentReceived = serializers.BooleanField(required=False)
+
+
+class TemoinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Temoin
+        fields = ['id', 'nom', 'coordonnees']
+
+
+class TiersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tiers
+        fields = ['id', 'nom', 'adresse', 'assurance', 'immatriculation']
+
+
+# --- UploadedFile Serializer (Now a ModelSerializer) ---
+class UploadedFileSerializer(serializers.ModelSerializer):
+    # Write-only input
+    contentieux = serializers.PrimaryKeyRelatedField(queryset=Contentieux.objects.all(), write_only=True)
+    uploaded_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True)
+
+    # Read-only output
+    contentieux_id = serializers.PrimaryKeyRelatedField(read_only=True, source='contentieux')
+    uploaded_by_id = serializers.PrimaryKeyRelatedField(read_only=True, source='uploaded_by')
+
+    class Meta:
+        model = UploadedFile
+        fields = '__all__'
+        read_only_fields = (
+            'id', 'created_at', 'updated_at',
+            'filename', 'path', 'size',
+            'contentieux_id', 'uploaded_by_id',
+        )
+
+    def create(self, validated_data):
+        """
+        Create UploadedFile instance. If you need to programmatically
+        assign related fields like contentieux or uploaded_by,
+        you can do it here.
+        """
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Optional: update logic.
+        """
+        return super().update(instance, validated_data)
+
+
+class DossierATMPSerializer(serializers.ModelSerializer):
+    status_display = serializers.CharField(
+        source='get_status_display', 
+        read_only=True
+    )
+    safety_manager = CustomUserSerializer(read_only=True)
+    created_by = CustomUserSerializer(read_only=True)
+    contentieux = ContentieuxSerializer(read_only=True)
+    audit = AuditSerializer(read_only=True)
+    temoins = TemoinSerializer(many=True, read_only=True)
+    tiers = TiersSerializer(read_only=True)
+    documents = DocumentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = DossierATMP
+        fields = [
+            'id', 'reference', 'safety_manager', 'title', 'description',
+            'date_of_incident', 'location', 'status', 'status_display',
+            'created_by', 'entreprise', 'salarie', 'accident',
+            'service_sante', 'documents', 'contentieux', 'audit',
+            'temoins', 'tiers', 'created_at'
+        ]
+        read_only_fields = ['reference', 'created_at', 'contentieux', 'audit']
+
+    def validate_entreprise(self, value):
+        required_fields = ['name', 'siret', 'address']
+        for field in required_fields:
+            if field not in value:
+                raise serializers.ValidationError(f"Missing required field in entreprise: {field}")
+        return value
+
+    def validate_salarie(self, value):
+        required_fields = ['first_name', 'last_name', 'social_security_number']
+        for field in required_fields:
+            if field not in value:
+                raise serializers.ValidationError(f"Missing required field in salarie: {field}")
+        return value
+
+    def validate_accident(self, value):
+        required_fields = ['date', 'time', 'description']
+        for field in required_fields:
+            if field not in value:
+                raise serializers.ValidationError(f"Missing required field in accident: {field}")
+        return value
+
+# Special serializers for write operations
+class DossierCreateSerializer(DossierATMPSerializer):
+    safety_manager = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.filter(role='SAFETY_MANAGER')
+    )
+    
+    class Meta:
+        model = DossierATMP
+        fields = [
+            'safety_manager', 'title', 'description',
+            'date_of_incident', 'location', 'entreprise',
+            'salarie', 'accident', 'service_sante'
+        ]

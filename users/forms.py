@@ -3,9 +3,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django_recaptcha.fields import ReCaptchaField
-from django_recaptcha.widgets import ReCaptchaV2Checkbox, ReCaptchaV3
-
-from .models import CustomUser
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
+from .models import CustomUser, UserRole
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -14,16 +13,12 @@ class CustomUserCreationForm(UserCreationForm):
         choices=ROLE_PROMPT,
         widget=forms.Select(attrs={'class': 'form-select'}),
         required=True,
+        #initial=UserRole.EMPLOYEE.value
     )
     
-    # Use reCAPTCHA v2 for register
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(
-        attrs={
-            #'data-theme': 'dark',
-            'data-size': 'compact'
-            }
-        )
-    )
+        attrs={'data-size': 'compact'}
+    ))
 
     class Meta:
         model = CustomUser
@@ -41,8 +36,6 @@ class CustomUserCreationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # style password fields
         self.fields['password1'].widget.attrs.update({
             'placeholder': 'Password',
             'class': 'form-control form-control-user',
@@ -55,13 +48,6 @@ class CustomUserCreationForm(UserCreationForm):
 
 class CustomAuthenticationForm(AuthenticationForm):
     username_field = CustomUser._meta.get_field('email')
-    
-    # Use reCAPTCHA v2 for login
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(
-        attrs={
-            #'data-theme': 'dark',
-            'data-size': 'compact'
-            }
-        )
-    )
-    
+        attrs={'data-size': 'compact'}
+    ))

@@ -1,0 +1,180 @@
+<!-- /home/siisi/atmp/atmp_app/templates/atmp_app/dashboard_direction.html -->
+
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans 'Direction Dashboard' %}{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{% trans 'Direction Dashboard' %}</h1>
+</div>
+
+<!-- Overall Summary -->
+<div class="row">
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            {% trans 'Total Dossiers AT/MP' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_dossiers }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-folder fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            {% trans 'Total Contentieux' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_contentieux }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-gavel fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            {% trans 'Total Audits' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_audits }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- High-level Status Breakdowns -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Dossiers AT/MP Status Summary' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for status in dossiers_status_summary %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ status.status }}
+                        <span class="badge badge-primary badge-pill">{{ status.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No dossier status data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Contentieux Status Summary' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for status in contentieux_status_summary %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ status.status }}
+                        <span class="badge badge-primary badge-pill">{{ status.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No contentieux status data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Audits Status Summary' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for status in audits_status_summary %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ status.status }}
+                        <span class="badge badge-primary badge-pill">{{ status.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No audit status data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Performance Indicators (KPIs) -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Contentieux from Contested Dossiers' %}</h6>
+            </div>
+            <div class="card-body">
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ contentieux_from_contested_dossiers }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Contentieux from Non-Contested Dossiers' %}</h6>
+            </div>
+            <div class="card-body">
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ contentieux_from_not_contested_dossiers }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data by Safety Manager -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Dossiers by Safety Manager' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for manager in dossiers_by_safety_manager %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ manager.safety_manager__username|default:"Unassigned" }}
+                        <span class="badge badge-primary badge-pill">{{ manager.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No safety manager data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

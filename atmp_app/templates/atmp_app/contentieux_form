@@ -1,0 +1,69 @@
+<!-- /home/siisi/atmp/atmp_app/templates/atmp_app/contentieux_form.html -->
+
+{% extends "base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}{% trans "Edit Contentieux" %}{% else %}{% trans "Create Contentieux" %}{% endif %}{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">
+        {% if form.instance.pk %}
+            <i class="fas fa-edit me-2"></i>{% trans "Edit Contentieux" %}
+        {% else %}
+            <i class="fas fa-plus-circle me-2"></i>{% trans "Create Contentieux" %}
+        {% endif %}
+    </h1>
+</div>
+
+<!-- Contentieux Form Card -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-gavel me-2"></i> {% trans "Contentieux Details" %}
+        </h6>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form.reference|as_crispy_field }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.status|as_crispy_field }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="mt-4 mb-3">{% trans "Subject Details" %}</h5>
+                    <div class="border p-3 mb-3">
+                        {{ form.subject|as_crispy_field }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="mt-4 mb-3">{% trans "Juridiction Steps" %}</h5>
+                    <div class="border p-3 mb-3">
+                        {{ form.juridiction_steps|as_crispy_field }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'atmp_app:incident-detail' pk=form.instance.dossier_atmp.pk %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> {% trans "Cancel" %}
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i> {% trans "Save" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

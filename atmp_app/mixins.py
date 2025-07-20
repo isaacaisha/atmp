@@ -26,24 +26,23 @@ ATMP Permission System Flow:
      • Safety Managers: See assigned incidents
 """
 
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 
 
-class ProviderOrSuperuserMixin(UserPassesTestMixin):
-    """Mixin to allow both employees (providers) and superusers to access views."""
+class ProviderOrSuperuserMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """Allows both employees and superusers"""
     def test_func(self):
         user = self.request.user
-        return user.is_authenticated and (user.is_superuser or user.role == 'employee')
+        return user.is_superuser or user.role == UserRole.EMPLOYEE
 
 
-class EmployeeRequiredMixin(UserPassesTestMixin):
-    """Mixin to allow only employees (providers) to access certain views."""
+class EmployeeRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """Strictly for employees only (no superuser access)"""
     def test_func(self):
-        return self.request.user.is_authenticated and self.request.user.role == 'employee'
+        return self.request.user.role == UserRole.EMPLOYEE
 
 
-class SafetyManagerMixin(UserPassesTestMixin):
-    """Mixin to allow only safety managers to access certain views."""
+class SafetyManagerMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """Only for safety managers (superusers get access by default)"""
     def test_func(self):
-        user = self.request.user
-        return user.is_authenticated and user.role == 'safety_manager'
+        return self.request.user.is_superuser or self.request.user.role == UserRole.SAFETY_MANAGER

@@ -1,0 +1,170 @@
+<!-- /home/siisi/atmp/atmp_app/templates/atmp_app/dashboard_juridique.html -->
+
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans 'Juridique Dashboard' %}{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{% trans 'Juridique Dashboard' %}</h1>
+</div>
+
+<!-- Contentieux Overview -->
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            {% trans 'Total Contentieux' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_contentieux }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-gavel fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            {% trans 'Pending Contentieux' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_contentieux }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            {% trans 'Total Juridiction Steps' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_juridiction_steps }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-list-ol fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Contentieux by Status -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Contentieux by Status' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for status in contentieux_by_status %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ status.status }}
+                        <span class="badge badge-primary badge-pill">{{ status.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No contentieux data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Juridiction Steps by Juridiction -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Juridiction Steps by Juridiction' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for step in steps_by_juridiction %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ step.juridiction }}
+                        <span class="badge badge-primary badge-pill">{{ step.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No juridiction steps by juridiction data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Juridiction Steps by Decision -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Juridiction Steps by Decision' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for step in steps_by_decision %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ step.decision }}
+                        <span class="badge badge-primary badge-pill">{{ step.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No juridiction steps by decision data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Contentieux -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Recent Contentieux' %}</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'Title' %}</th>
+                                <th>{% trans 'Status' %}</th>
+                                <th>{% trans 'Created At' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contentieux in recent_contentieux %}
+                            <tr>
+                                <td>{{ contentieux.title }}</td>
+                                <td>{{ contentieux.status }}</td>
+                                <td>{{ contentieux.created_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">{% trans 'No recent contentieux found.' %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

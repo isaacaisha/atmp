@@ -1,0 +1,135 @@
+<!-- /home/siisi/atmp/atmp_app/templates/atmp_app/dashboard_rh.html -->
+
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans 'RH Dashboard' %}{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{% trans 'RH Dashboard' %}</h1>
+</div>
+
+<!-- Incidents Overview -->
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            {% trans 'Total Incidents (Dossiers AT/MP)' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_incidents }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            {% trans 'Incidents to Analyze' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ incidents_a_analyser_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-search fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            {% trans 'Incidents Under Analysis' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ incidents_en_analyse_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Incidents by Status -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Incidents by Status' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for status in incidents_by_status %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ status.status }}
+                        <span class="badge badge-primary badge-pill">{{ status.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No incident status data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incidents by Creator Role -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Incidents by Creator Role' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for role in incidents_by_creator_role %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ role.created_by__role|default:"N/A" }}
+                        <span class="badge badge-primary badge-pill">{{ role.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No incident creator role data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incidents by Safety Manager -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Incidents by Safety Manager' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for manager in incidents_by_safety_manager %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ manager.safety_manager__username|default:"Unassigned" }}
+                        <span class="badge badge-primary badge-pill">{{ manager.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No incident safety manager data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

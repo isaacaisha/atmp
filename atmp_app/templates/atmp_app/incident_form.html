@@ -63,21 +63,21 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                <label for="{{ form.document.id_for_label }}" class="form-label">{% trans "Attach Document" %}</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-paperclip"></i></span>
-                    {{ form.document|add_class:"form-control" }}
+                    <label for="{{ form.file.id_for_label }}" class="form-label">{% trans "Attach file" %}</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-paperclip"></i></span>
+                        {{ form.file|add_class:"form-control" }}
+                    </div>
+                    <div class="text-danger small">{{ form.file.errors }}</div>
                 </div>
-                <div class="text-danger small">{{ form.document.errors }}</div>
                 <div class="form-text small text-muted">
                     {% trans "Allowed: PDF, DOC, JPG, PNG (max 10MB)" %}
                 </div>
             </div>
-            </div>
 
             <div class="d-flex justify-content-between gap-3 mt-3">
                 <div>
-                    <a href="{% url 'atmp_app:incident-list' %}" class="btn btn-outline-secondary">
+                    <a href="{% url 'atmp_app:dashboard' %}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i> {% trans 'Cancel' %}
                     </a>
                 </div>

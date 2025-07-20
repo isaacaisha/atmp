@@ -1,5 +1,6 @@
 # /home/siisi/atmp/atmp_app/forms.py
 
+import json
 from django import forms
 from django.contrib.auth import get_user_model
 
@@ -8,17 +9,21 @@ from .models import DossierATMP, Contentieux, Document
 User = get_user_model()
 
 
+class JSONEditorWidget(forms.Textarea):
+    def render(self, name, value, attrs=None, renderer=None):
+        if isinstance(value, dict) or isinstance(value, list):
+            value = json.dumps(value, indent=2)
+        return super().render(name, value, attrs, renderer)
+
+
 class SafetyManagerChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return obj.name or obj.email
+        return obj.get_full_name() or obj.email
 
 
 class DossierATMPForm(forms.ModelForm):
-    """
-    Form to create/edit a DossierATMP.
-    """
     safety_manager = SafetyManagerChoiceField(
-        queryset=User.objects.filter(role='safety_manager'),
+        queryset=User.objects.filter(role='SAFETY_MANAGER'),
         widget=forms.Select(attrs={'class': 'form-select'})
     )
     date_of_incident = forms.DateField(
@@ -32,67 +37,68 @@ class DossierATMPForm(forms.ModelForm):
             'safety_manager',
             'title',
             'description',
+            'status',
             'date_of_incident',
             'location',
-            'status'
+            'entreprise',
+            'salarie',
+            'accident',
+            'service_sante',
         ]
         widgets = {
             'reference':   forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'title':       forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'location':    forms.TextInput(attrs={'class': 'form-control'}),
-            'status':      forms.Select(attrs={'class': 'form-select'}),
+            'location': forms.TextInput(attrs={'class': 'form-control'}),
+            'entreprise': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'salarie': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'accident': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'service_sante': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 
 class ContentieuxForm(forms.ModelForm):
-    """
-    Form to create/edit a Contentieux linked to a DossierATMP.
-    """
-    dossier_atmp = forms.ModelChoiceField(
-        queryset=DossierATMP.objects.all(),
-        label="Dossier ATMP",
-        widget=forms.Select(attrs={'class': 'form-select'})
-    )
-
     class Meta:
         model = Contentieux
         fields = [
             'dossier_atmp',
-            'reference',
-            'status',
             'subject',
-            'juridiction_steps'
+            'status'
         ]
         widgets = {
-            'reference':         forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
-            'status':            forms.Select(attrs={'class': 'form-select'}),
-            'subject':           forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'juridiction_steps': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'dossier_atmp': forms.Select(attrs={'class': 'form-select'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'subject': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
 
 class DocumentForm(forms.ModelForm):
-    """
-    Form to upload a Document for a specific Contentieux.
-    """
-    contentieux = forms.ModelChoiceField(
-        queryset=Contentieux.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-select'})
-    )
-
     class Meta:
         model = Document
-        fields = [
-            'contentieux',
-            'uploaded_by',
-            'file',
-            'document_type',
-            'original_name'
-        ]
+        fields = ['document_type', 'file', 'description', 'contentieux']
         widgets = {
-            'uploaded_by':   forms.Select(attrs={'class': 'form-select'}),
-            'file':          forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'document_type': forms.Select(attrs={'class': 'form-select'}),
-            'original_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'file': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'contentieux': forms.Select(attrs={'class': 'form-select'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make contentieux optional if it exists in fields
+        if 'contentieux' in self.fields:
+            self.fields['contentieux'].required = False
+            # Limit contentieux choices to those related to the dossier
+            if 'initial' in kwargs and 'contentieux' in kwargs['initial']:
+                self.fields['contentieux'].queryset = Contentieux.objects.filter(
+                    dossier_atmp=kwargs['initial']['contentieux'].dossier_atmp
+                )
+    
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if file:
+            # Validate file size (e.g., 10MB max)
+            max_size = 10 * 1024 * 1024
+            if file.size > max_size:
+                raise forms.ValidationError(f"File too large. Size should not exceed {max_size/1024/1024}MB.")
+        return file

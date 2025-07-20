@@ -1,6 +1,10 @@
 # /home/siisi/atmp/atmp_app/auth_views.py
 
-from django.contrib.auth import authenticate, login as django_login, logout as django_logout
+from django.contrib.auth import (
+    authenticate,
+    login as django_login,
+    logout as django_logout
+    )
 from django_otp import devices_for_user
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
@@ -15,7 +19,6 @@ from .auth_serializers import (
     ProfileSerializer,
     LogoutSerializer,
 )
-
 from users.models import CustomUser
 
 
@@ -110,7 +113,10 @@ class AuthViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         if not confirmed:
             # no 2FA set up → straight in
             django_login(request, user)
-            return Response({'detail':'Logged in (no 2FA)'}, status=200)
+            return Response({
+                'success': True,
+                'detail':'Logged in (no 2FA) 🚀'
+            }, status=status.HTTP_200_OK)
 
         # Step 3: user *does* have TOTP devices → require OTP
         if not otp:
@@ -126,7 +132,10 @@ class AuthViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
         # OTP is good → complete login
         django_login(request, user)
-        return Response({'detail':'Logged in (2FA)'}, status=200)
+        return Response({
+                'success': True,
+                'detail':'Logged in (2FA) 🚀'
+            }, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get", "post"], url_path="profile", permission_classes=[IsAuthenticated])
     def profile(self, request):

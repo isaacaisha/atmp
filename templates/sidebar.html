@@ -11,7 +11,7 @@
         </div>
         <div class="sidebar-brand-text mx-3">
             {% if user.is_authenticated %}
-                {{ user.name }}
+                {{ user.name|default:user.email }} {# Use user.name or user.email if name is not set #}
             {% else %} 
                 {% trans "ATMP" %} <sup>1</sup>
             {% endif %}
@@ -24,9 +24,47 @@
     <li class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
         <a class="nav-link" href="{% url 'atmp_app:dashboard' %}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>{% trans "Dashboard" %}</span>
+            <span>{% trans "Main Dashboard" %}</span>
         </a>
     </li>
+
+    {% if user.is_authenticated %}
+        {% if user.is_superuser or user.role == 'juridique' %}
+        <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-juridique' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'atmp_app:dashboard-juridique' %}">
+                <i class="fas fa-fw fa-gavel"></i> {# Icon for legal/juridique #}
+                <span>{% trans "Juridique Dashboard" %}</span>
+            </a>
+        </li>
+        {% endif %}
+
+        {% if user.is_superuser or user.role == 'rh' %}
+        <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-rh' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'atmp_app:dashboard-rh' %}">
+                <i class="fas fa-fw fa-users"></i> {# Icon for HR #}
+                <span>{% trans "RH Dashboard" %}</span>
+            </a>
+        </li>
+        {% endif %}
+
+        {% if user.is_superuser or user.role == 'qse' %}
+        <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-qse' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'atmp_app:dashboard-qse' %}">
+                <i class="fas fa-fw fa-shield-alt"></i> {# Icon for QSE #}
+                <span>{% trans "QSE Dashboard" %}</span>
+            </a>
+        </li>
+        {% endif %}
+
+        {% if user.is_superuser or user.role == 'direction' %}
+        <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-direction' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'atmp_app:dashboard-direction' %}">
+                <i class="fas fa-fw fa-chart-line"></i> {# Icon for Direction #}
+                <span>{% trans "Direction Dashboard" %}</span>
+            </a>
+        </li>
+        {% endif %}
+    {% endif %}
 
     <!-- Divider -->
     <hr class="sidebar-divider">

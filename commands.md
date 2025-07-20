@@ -92,6 +92,8 @@ docker exec -it atmp_prod-atmp-1 python manage.py migrate
 docker exec -it atmp_prod-atmp-1 python manage.py createsuperuser
 docker exec -it atmp_prod-atmp-1 python manage.py shell
 docker exec -it atmp_prod-atmp-1 bash
+<!-- Run seed_data -->
+docker exec -it atmp_prod-atmp-1 python manage.py seed_data
 
 <!-- dev -->
 docker exec -it atmp_dev-atmp-1 python manage.py makemigrations

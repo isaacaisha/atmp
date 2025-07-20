@@ -1,0 +1,175 @@
+<!-- /home/siisi/atmp/atmp_app/templates/atmp_app/dashboard_qse.html -->
+
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans 'QSE Dashboard' %}{% endblock %}
+
+{% block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{% trans 'QSE Dashboard' %}</h1>
+</div>
+
+<!-- Incidents & Audits Overview -->
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            {% trans 'Total Incidents (Dossiers AT/MP)' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_incidents }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            {% trans 'Total Audits' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_audits }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            {% trans 'Audits In Progress' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ audits_in_progress }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-sync-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                            {% trans 'Incidents Recommended for Contest' %}
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ contestation_recommended_incidents }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Incidents by Status -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Incidents by Status' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for status in incidents_by_status %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ status.status }}
+                        <span class="badge badge-primary badge-pill">{{ status.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No incident status data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incidents by Location -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Incidents by Location' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for location in incidents_by_location %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ location.location|default:"N/A" }}
+                        <span class="badge badge-primary badge-pill">{{ location.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No incident location data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audits by Status -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Audits by Status' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for status in audits_by_status %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ status.status }}
+                        <span class="badge badge-primary badge-pill">{{ status.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No audit status data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audits by Decision -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{% trans 'Audits by Decision' %}</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for decision in audits_by_decision %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ decision.decision }}
+                        <span class="badge badge-primary badge-pill">{{ decision.count }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">{% trans 'No audit decision data available.' %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+<!-- /home/siisi/atmp/atmp_app/templates/atmp_app/document_upload.html -->
+
+{% extends "base.html" %}
+{% load i18n file_extras %}
+
+{% block title %}{% trans 'Upload Document' %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4><i class="fas fa-file-upload me-2"></i>{% trans "Upload Document" %}</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="{{ form.document_type.id_for_label }}" class="form-label">
+                        {% trans "Document Type" %}
+                    </label>
+                    {{ form.document_type }}
+                    {% if form.document_type.errors %}
+                    <div class="text-danger">{{ form.document_type.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.file.id_for_label }}" class="form-label">
+                        {% trans "File" %}
+                    </label>
+                    {{ form.file }}
+                    {% if form.file.errors %}
+                    <div class="text-danger">{{ form.file.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">
+                        {% trans "Description" %}
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                    <div class="text-danger">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'atmp_app:incident-detail' pk=incident_pk %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> {% trans "Cancel" %}
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i> {% trans "Upload" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mt-4">
+        <div class="card-header bg-info text-white">
+            <h4><i class="fas fa-list me-2"></i>{% trans "Existing Documents" %}</h4>
+        </div>
+        <div class="card-body">
+            {% if documents %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Type" %}</th>
+                            <th>{% trans "File" %}</th>
+                            <th>{% trans "Uploaded By" %}</th>
+                            <th>{% trans "Date" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in documents %}
+                        <tr>
+                            <td>{{ doc.get_document_type_display }}</td>
+                            <td>
+                                <a href="{{ doc.file.url }}" target="_blank" class="text-decoration-none">
+                                    <i class="fas fa-file-download me-2"></i>{{ doc.file.name|basename }}
+                                </a>
+                            </td>
+                            <td>{{ doc.uploaded_by.get_full_name }}</td>
+                            <td>{{ doc.created_at|date:"SHORT_DATE_FORMAT" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">{% trans "No documents uploaded yet" %}</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
