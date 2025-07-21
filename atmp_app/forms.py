@@ -6,15 +6,10 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from .models import DossierATMP, Contentieux, Document, DocumentType, DossierStatus
+from users.models import UserRole # Import UserRole
+
 
 User = get_user_model()
-
-
-class JSONEditorWidget(forms.Textarea):
-    def render(self, name, value, attrs=None, renderer=None):
-        if isinstance(value, dict) or isinstance(value, list):
-            value = json.dumps(value, indent=2)
-        return super().render(name, value, attrs, renderer)
 
 
 class SafetyManagerChoiceField(forms.ModelChoiceField):
@@ -25,40 +20,41 @@ class SafetyManagerChoiceField(forms.ModelChoiceField):
 class EntrepriseForm(forms.Form):
     name = forms.CharField(max_length=255, required=True,
                            widget=forms.TextInput(attrs={'class': 'form-control'}))
-    address = forms.CharField(max_length=255, required=False,
+    address = forms.CharField(max_length=255, required=True, # Changed to required=True to match serializer validation
                               widget=forms.TextInput(attrs={'class': 'form-control'}))
-    siret = forms.CharField(max_length=14, required=False,
+    siret = forms.CharField(max_length=14, required=True, # Changed to required=True to match serializer validation
                             widget=forms.TextInput(attrs={'class': 'form-control'}),
                             help_text="14-digit SIRET number")
-    # Add other fields as per your 'entreprise' JSON structure
 
-# New Form for Salarie JSON data
+
 class SalarieForm(forms.Form):
     first_name = forms.CharField(max_length=100, required=True,
                                  widget=forms.TextInput(attrs={'class': 'form-control'}))
     last_name = forms.CharField(max_length=100, required=True,
                                 widget=forms.TextInput(attrs={'class': 'form-control'}))
+    social_security_number = forms.CharField(max_length=15, required=True, # Added to match serializer validation
+                                              widget=forms.TextInput(attrs={'class': 'form-control'}),
+                                              help_text="e.g., 179052A12345678")
     date_of_birth = forms.DateField(required=False,
                                     widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
     job_title = forms.CharField(max_length=100, required=False,
                                 widget=forms.TextInput(attrs={'class': 'form-control'}))
-    # Add other fields as per your 'salarie' JSON structure
 
-# New Form for Accident JSON data
+
 class AccidentForm(forms.Form):
-    type_of_accident = forms.CharField(max_length=255, required=True,
+    date = forms.DateField(required=True, widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})) # Added to match serializer validation
+    time = forms.TimeField(required=True, widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'})) # Added to match serializer validation
+    description = forms.CharField(required=True, # Added to match serializer validation
+                                  widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}))
+    type_of_accident = forms.CharField(max_length=255, required=False, 
                                        widget=forms.TextInput(attrs={'class': 'form-control'}))
     detailed_circumstances = forms.CharField(required=True,
                                              widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}))
-    # You might have fields like 'body_part_affected', 'material_involved', etc.
-    # For example:
-    # body_part_affected = forms.CharField(max_length=255, required=False,
-    #                                      widget=forms.TextInput(attrs={'class': 'form-control'}))
 
 
 class DossierATMPForm(forms.ModelForm):
     safety_manager = SafetyManagerChoiceField(
-        queryset=User.objects.filter(role='SAFETY_MANAGER'),
+        queryset=User.objects.filter(role=UserRole.SAFETY_MANAGER),
         widget=forms.Select(attrs={'class': 'form-select'})
     )
     date_of_incident = forms.DateField(
@@ -78,23 +74,15 @@ class DossierATMPForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2})
     )
 
-    # NO LONGER NEEDED AS THEY ARE HANDLED BY SUB-FORMS:
-    # entreprise = forms.CharField(widget=JSONEditorWidget(...), required=False)
-    # salarie = forms.CharField(widget=JSONEditorWidget(...), required=False)
-    # accident = forms.CharField(widget=JSONEditorWidget(...), required=False)
-
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
-        # Instantiate the nested forms
-        # Pass initial data if updating an existing incident
         initial_entreprise_data = self.instance.entreprise if self.instance and self.instance.entreprise else {}
         initial_salarie_data = self.instance.salarie if self.instance and self.instance.salarie else {}
         initial_accident_data = self.instance.accident if self.instance and self.instance.accident else {}
 
-        # Add prefixes to avoid field name collisions (important!)
         self.entreprise_form = EntrepriseForm(
             self.data if self.is_bound else None,
             prefix='entreprise',
@@ -122,7 +110,7 @@ class DossierATMPForm(forms.ModelForm):
             'date_of_incident',
             'location',
             'service_sante',
-            # 'temoins', 'tiers_implique' - if you want to handle these JSONFields similarly
+            # 'temoins', 'tiers_implique' - these were JSONFields, now only 'tiers_implique' remains as JSONField
         ]
         widgets = {
             'reference':   forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
@@ -130,30 +118,45 @@ class DossierATMPForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'location': forms.TextInput(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
-            # REMOVE JSONEditorWidget entries for entreprise, salarie, accident
             'service_sante': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def is_valid(self):
-        # Validate all forms: the main form and the nested forms
         main_form_valid = super().is_valid()
         entreprise_form_valid = self.entreprise_form.is_valid()
         salarie_form_valid = self.salarie_form.is_valid()
         accident_form_valid = self.accident_form.is_valid()
+        
         return main_form_valid and entreprise_form_valid and salarie_form_valid and accident_form_valid
 
     def clean(self):
         cleaned_data = super().clean()
 
-        # Merge cleaned data from nested forms into the main cleaned_data
         if self.entreprise_form.is_valid():
             cleaned_data['entreprise'] = self.entreprise_form.cleaned_data
+        else:
+            for field, errors in self.entreprise_form.errors.items():
+                self.add_error(f'entreprise-{field}', errors) 
+            if not self.entreprise_form.non_field_errors():
+                 self.add_error(None, "Please correct errors in the Company Details section.")
+
+
         if self.salarie_form.is_valid():
             cleaned_data['salarie'] = self.salarie_form.cleaned_data
+        else:
+            for field, errors in self.salarie_form.errors.items():
+                self.add_error(f'salarie-{field}', errors)
+            if not self.salarie_form.non_field_errors():
+                self.add_error(None, "Please correct errors in the Employee Details section.")
+
         if self.accident_form.is_valid():
             cleaned_data['accident'] = self.accident_form.cleaned_data
+        else:
+            for field, errors in self.accident_form.errors.items():
+                self.add_error(f'accident-{field}', errors)
+            if not self.accident_form.non_field_errors():
+                self.add_error(None, "Please correct errors in the Accident Details section.")
 
-        # --- Your existing file upload validation ---
         uploaded_file = cleaned_data.get('uploaded_file')
         document_type = cleaned_data.get('document_type')
 
@@ -161,15 +164,13 @@ class DossierATMPForm(forms.ModelForm):
             self.add_error('document_type', "Document type is required if a file is uploaded.")
         elif document_type and not uploaded_file:
              self.add_error('uploaded_file', "A file is required if document type is selected.")
-        # --- End existing file upload validation ---
 
         return cleaned_data
 
-    # Add a clean method for the uploaded_file to perform validation
     def clean_uploaded_file(self):
         file = self.cleaned_data.get('uploaded_file')
         if file:
-            max_size = 10 * 1024 * 1024 # 10MB
+            max_size = 10 * 1024 * 1024 
             if file.size > max_size:
                 raise ValidationError(f"File too large. Size should not exceed {max_size/1024/1024:.0f}MB.")
         return file
@@ -181,13 +182,41 @@ class ContentieuxForm(forms.ModelForm):
         fields = [
             'dossier_atmp',
             'subject',
-            'status'
+            'status',
+            'juridiction_steps', 
         ]
         widgets = {
-            'dossier_atmp': forms.Select(attrs={'class': 'form-select'}),
+            'dossier_atmp': forms.Select(attrs={'class': 'form-select', 'readonly': 'readonly'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
             'subject': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'juridiction_steps': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}), 
         }
+
+    def clean_subject(self):
+        data = self.cleaned_data['subject']
+        if isinstance(data, str):
+            try:
+                return json.loads(data)
+            except json.JSONDecodeError:
+                raise forms.ValidationError("Invalid JSON format for Subject.")
+        return data
+
+    def clean_juridiction_steps(self):
+        data = self.cleaned_data['juridiction_steps']
+        if isinstance(data, str):
+            try:
+                return json.loads(data)
+            except json.JSONDecodeError:
+                raise forms.ValidationError("Invalid JSON format for Juridiction Steps.")
+        return data
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            if isinstance(self.instance.subject, dict):
+                self.initial['subject'] = json.dumps(self.instance.subject, indent=2)
+            if isinstance(self.instance.juridiction_steps, dict):
+                self.initial['juridiction_steps'] = json.dumps(self.instance.juridiction_steps, indent=2)
 
 
 class DocumentForm(forms.ModelForm):
@@ -203,19 +232,12 @@ class DocumentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make contentieux optional if it exists in fields
         if 'contentieux' in self.fields:
             self.fields['contentieux'].required = False
-            # Limit contentieux choices to those related to the dossier
-            if 'initial' in kwargs and 'contentieux' in kwargs['initial']:
-                self.fields['contentieux'].queryset = Contentieux.objects.filter(
-                    dossier_atmp=kwargs['initial']['contentieux'].dossier_atmp
-                )
     
     def clean_file(self):
         file = self.cleaned_data.get('file')
         if file:
-            # Validate file size (e.g., 10MB max)
             max_size = 10 * 1024 * 1024
             if file.size > max_size:
                 raise forms.ValidationError(f"File too large. Size should not exceed {max_size/1024/1024}MB.")

@@ -8,7 +8,13 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
   <h1 class="h3 mb-0 text-gray-800">{% trans "My ATMP Incidents" %}</h1>
-  {% if user.role == user.is_superuser or 'employee' %}
+  {% comment %}
+  Refactored condition: user.is_superuser or (user.is_authenticated and user.role == 'employee')
+  The original `user.role == user.is_superuser or 'employee'` would always evaluate to True
+  because `'employee'` is a non-empty string and thus truthy.
+  Assuming the intention was that only superusers OR employees can report incidents.
+  {% endcomment %}
+  {% if user.is_superuser or user.role == 'employee' %}
   <a href="{% url 'atmp_app:incident-create' %}" class="btn btn-sm btn-primary shadow-sm">
     <i class="fas fa-plus fa-sm text-white-50 me-2"></i> {% trans "Report a New Incident" %}
   </a>
@@ -33,14 +39,25 @@
             <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1;">
               <i class="fas fa-calendar-day me-1"></i> {% trans "Date" %}
             </th>
-            <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
+            <th scope="col"
+              style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
               <i class="fas fa-info-circle me-1"></i> {% trans "Status" %}
             </th>
-            {% if user.role == user.is_superuser or 'employee' %}
+            {% comment %}
+            Refactored condition for Edit/Delete buttons.
+            Only the creator of the incident OR the assigned safety manager OR a superuser should be able to
+            edit/delete.
+            The list view itself might show incidents to safety managers who didn't create them.
+            This template block is within the loop, so `inc` object is available.
+            The `IncidentUpdateView` and `IncidentDeleteView` already have `get_queryset` and `ProviderOrSuperuserMixin`
+            to restrict access, so this template level check mirrors that.
+            {% endcomment %}
+            {% if user.is_superuser or inc.created_by == user or inc.safety_manager == user %}
             <th scope="col" style="position: sticky; top: 0; z-index: 1; white-space: nowrap;">
               <i class="fa fa-pen-square me-1"></i> {% trans "Edit" %}
             </th>
-            <th scope="col" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
+            <th scope="col"
+              style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
               <i class="fa fa-trash me-1"></i> {% trans "Delete" %}
             </th>
             {% endif %}
@@ -60,7 +77,7 @@
                 <span class="badge bg-info text-dark mb-0">{{ inc.get_status_display }}</span>
               </div>
             </td>
-            {% if user.role == user.is_superuser or 'employee' %}
+            {% if user.is_superuser or inc.created_by == user or inc.safety_manager == user %}
             <td>
               <a href="{% url 'atmp_app:incident-update' inc.pk %}" class="text-decoration-none text-warning">
                 <i class="fa fa-pen-square"></i>
@@ -75,7 +92,7 @@
           </tr>
           {% empty %}
           <tr>
-            <td colspan="3" class="text-center text-muted">
+            <td colspan="5" class="text-center text-muted">
               <em>{% trans "No incidents reported yet." %}</em>
             </td>
           </tr>

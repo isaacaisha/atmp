@@ -1,7 +1,7 @@
 <!-- /home/siisi/atmp/atmp_app/templates/atmp_app/document_upload.html -->
 
 {% extends "base.html" %}
-{% load i18n file_extras %}
+{% load i18n widget_tweaks %} {# Added widget_tweaks for form rendering #}
 
 {% block title %}{% trans 'Upload Document' %}{% endblock %}
 
@@ -12,16 +12,17 @@
             <h4><i class="fas fa-file-upload me-2"></i>{% trans "Upload Document" %}</h4>
         </div>
         <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
+                {{ form.non_field_errors }} {# Display form-wide errors #}
 
                 <div class="mb-3">
                     <label for="{{ form.document_type.id_for_label }}" class="form-label">
                         {% trans "Document Type" %}
                     </label>
-                    {{ form.document_type }}
+                    {{ form.document_type|add_class:"form-select" }}
                     {% if form.document_type.errors %}
-                    <div class="text-danger">{{ form.document_type.errors }}</div>
+                    <div class="text-danger small">{{ form.document_type.errors }}</div>
                     {% endif %}
                 </div>
 
@@ -29,24 +30,29 @@
                     <label for="{{ form.file.id_for_label }}" class="form-label">
                         {% trans "File" %}
                     </label>
-                    {{ form.file }}
+                    {{ form.file|add_class:"form-control" }}
                     {% if form.file.errors %}
-                    <div class="text-danger">{{ form.file.errors }}</div>
+                    <div class="text-danger small">{{ form.file.errors }}</div>
                     {% endif %}
+                    <div class="form-text text-muted">{% trans "Max file size: 10MB. Allowed types: PDF, DOCX, JPG, PNG." %}</div>
                 </div>
 
                 <div class="mb-3">
                     <label for="{{ form.description.id_for_label }}" class="form-label">
                         {% trans "Description" %}
                     </label>
-                    {{ form.description }}
+                    {{ form.description|add_class:"form-control" }} {# Apply Bootstrap class #}
                     {% if form.description.errors %}
-                    <div class="text-danger">{{ form.description.errors }}</div>
+                    <div class="text-danger small">{{ form.description.errors }}</div>
                     {% endif %}
                 </div>
 
+                {# The contentieux field is hidden and pre-set in the view, if applicable #}
+                {{ form.contentieux }}
+
                 <div class="d-flex justify-content-between mt-4">
-                    <a href="{% url 'atmp_app:incident-detail' pk=incident_pk %}" class="btn btn-secondary">
+                    {# Use incident_pk passed from context for back URL #}
+                    <a href="{% url 'atmp_app:incident-detail' pk=incident_pk %}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i> {% trans "Cancel" %}
                     </a>
                     <button type="submit" class="btn btn-primary">
@@ -69,6 +75,7 @@
                         <tr>
                             <th>{% trans "Type" %}</th>
                             <th>{% trans "File" %}</th>
+                            <th>{% trans "Description" %}</th> {# Added description column #}
                             <th>{% trans "Uploaded By" %}</th>
                             <th>{% trans "Date" %}</th>
                         </tr>
@@ -78,10 +85,16 @@
                         <tr>
                             <td>{{ doc.get_document_type_display }}</td>
                             <td>
+                                {% comment %} Ensure doc.file.url exists before linking {% endcomment %}
+                                {% if doc.file %}
                                 <a href="{{ doc.file.url }}" target="_blank" class="text-decoration-none">
-                                    <i class="fas fa-file-download me-2"></i>{{ doc.file.name|basename }}
+                                    <i class="fas fa-file-download me-2"></i>{{ doc.original_name }}
                                 </a>
+                                {% else %}
+                                {{ doc.original_name }} (File Missing)
+                                {% endif %}
                             </td>
+                            <td>{{ doc.description|default:"-" }}</td> {# Display description #}
                             <td>{{ doc.uploaded_by.get_full_name }}</td>
                             <td>{{ doc.created_at|date:"SHORT_DATE_FORMAT" }}</td>
                         </tr>

@@ -19,8 +19,9 @@ def notify_syndic(sender, instance, created, **kwargs):
         Date: {instance.date_of_incident}
         Location: {instance.location}
         Description: {instance.description}
-        Please review at: http://atmp.siisi.online/admin/atmp_app/atmpincident/{instance.id}
-        Please review at: http://atmp.siisi.online/api/atmp/incidents/{instance.id}/
+        ADMIN, Please review at: http://atmp.siisi.online/admin/atmp_app/dossieratmp/{instance.id}
+        HTML, Please review at: http://atmp.siisi.online/atmp_app/incidents/{instance.id}
+        API, Please review at: http://atmp.siisi.online/atmp/api/dossiers/{instance.id}/
         """
 
         # Collect recipients

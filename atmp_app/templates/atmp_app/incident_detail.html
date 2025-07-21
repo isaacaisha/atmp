@@ -9,6 +9,24 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">{{ incident.title }}</h1>
+    <div>
+        {% if user.is_superuser or incident.created_by == user or incident.safety_manager == user %}
+        <a href="{% url 'atmp_app:incident-update' incident.pk %}" class="btn btn-warning btn-sm shadow-sm me-2">
+            <i class="fas fa-edit fa-sm text-white-50"></i> {% trans "Edit Incident" %}
+        </a>
+        <a href="{% url 'atmp_app:document-upload' incident.pk %}" class="btn btn-info btn-sm shadow-sm me-2">
+            <i class="fas fa-upload fa-sm text-white-50"></i> {% trans "Upload Document" %}
+        </a>
+        {% if not incident.contentieux %}
+        <a href="{% url 'atmp_app:contentieux-create' incident.pk %}" class="btn btn-primary btn-sm shadow-sm me-2">
+            <i class="fas fa-gavel fa-sm text-white-50"></i> {% trans "Create Contentieux" %}
+        </a>
+        {% endif %}
+        <a href="{% url 'atmp_app:incident-delete' incident.pk %}" class="btn btn-danger btn-sm shadow-sm">
+            <i class="fas fa-trash fa-sm text-white-50"></i> {% trans "Delete Incident" %}
+        </a>
+        {% endif %}
+    </div>
 </div>
 
 <!-- Incident Details Card -->
@@ -20,26 +38,38 @@
     </div>
     <div class="card-body">
         <div class="row mb-4">
-            <!-- Left Column -->
+            <!-- Left Column: Core Incident Info -->
             <div class="col-md-6">
                 <dl class="row mb-0">
+                    <dt class="col-sm-4">{% trans "Reference" %}</dt>
+                    <dd class="col-sm-8">{{ incident.reference }}</dd>
+
                     <dt class="col-sm-4">{% trans "Status" %}</dt>
                     <dd class="col-sm-8">
                         <span class="badge bg-info text-dark">{{ incident.get_status_display }}</span>
                     </dd>
 
-                    <dt class="col-sm-4">{% trans "Date" %}</dt>
+                    <dt class="col-sm-4">{% trans "Date of Incident" %}</dt>
                     <dd class="col-sm-8">{{ incident.date_of_incident|date:"F j, Y" }}</dd>
 
                     <dt class="col-sm-4">{% trans "Location" %}</dt>
                     <dd class="col-sm-8">{{ incident.location }}</dd>
+
+                    <dt class="col-sm-4">{% trans "Reported By" %}</dt>
+                    <dd class="col-sm-8">{{ incident.created_by.get_full_name }} ({{ incident.created_by.email }})</dd>
+
+                    <dt class="col-sm-4">{% trans "Safety Manager" %}</dt>
+                    <dd class="col-sm-8">{{ incident.safety_manager.get_full_name }} ({{ incident.safety_manager.email }})</dd>
+
+                    <dt class="col-sm-4">{% trans "Health Service" %}</dt>
+                    <dd class="col-sm-8">{{ incident.service_sante|default:"N/A" }}</dd>
                 </dl>
             </div>
 
-            <!-- Right Column -->
+            <!-- Right Column: Description -->
             <div class="col-md-6">
                 <div class="mb-3">
-                    <h6 class="font-weight-bold">{% trans "Description" %}</h6>
+                    <h6 class="font-weight-bold">{% trans "Detailed Description" %}</h6>
                     <p class="text-muted">{{ incident.description|linebreaks }}</p>
                 </div>
             </div>
@@ -47,25 +77,217 @@
 
         <hr>
 
+        {# Additional Sections: Dynamically display based on data presence #}
+
+        <!-- Company Details -->
+        {% if incident.entreprise %}
+        <h5 class="mt-4 mb-3"><i class="fas fa-building me-2"></i>{% trans "Company Details" %}</h5>
+        <dl class="row mb-4">
+            <dt class="col-sm-4">{% trans "Name" %}</dt>
+            <dd class="col-sm-8">{{ incident.entreprise.name|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Address" %}</dt>
+            <dd class="col-sm-8">{{ incident.entreprise.address|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "SIRET" %}</dt>
+            <dd class="col-sm-8">{{ incident.entreprise.siret|default:"N/A" }}</dd>
+        </dl>
+        <hr>
+        {% endif %}
+
+        <!-- Employee Details (Salarie) -->
+        {% if incident.salarie %}
+        <h5 class="mt-4 mb-3"><i class="fas fa-user me-2"></i>{% trans "Employee Details" %}</h5>
+        <dl class="row mb-4">
+            <dt class="col-sm-4">{% trans "First Name" %}</dt>
+            <dd class="col-sm-8">{{ incident.salarie.first_name|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Last Name" %}</dt>
+            <dd class="col-sm-8">{{ incident.salarie.last_name|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Social Security No." %}</dt>
+            <dd class="col-sm-8">{{ incident.salarie.social_security_number|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Date of Birth" %}</dt>
+            <dd class="col-sm-8">{{ incident.salarie.date_of_birth|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Job Title" %}</dt>
+            <dd class="col-sm-8">{{ incident.salarie.job_title|default:"N/A" }}</dd>
+        </dl>
+        <hr>
+        {% endif %}
+
+        <!-- Accident Details -->
+        {% if incident.accident %}
+        <h5 class="mt-4 mb-3"><i class="fas fa-car-crash me-2"></i>{% trans "Accident Details" %}</h5>
+        <dl class="row mb-4">
+            <dt class="col-sm-4">{% trans "Accident Date" %}</dt>
+            <dd class="col-sm-8">{{ incident.accident.date|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Accident Time" %}</dt>
+            <dd class="col-sm-8">{{ incident.accident.time|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Type of Accident" %}</dt>
+            <dd class="col-sm-8">{{ incident.accident.type_of_accident|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Description" %}</dt>
+            <dd class="col-sm-8">{{ incident.accident.description|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Detailed Circumstances" %}</dt>
+            <dd class="col-sm-8">{{ incident.accident.detailed_circumstances|default:"N/A" }}</dd>
+        </dl>
+        <hr>
+        {% endif %}
+
+        <!-- Witnesses (Now uses Temoin model) -->
+        <h5 class="mt-4 mb-3"><i class="fas fa-user-friends me-2"></i>{% trans "Witnesses" %}</h5>
+        {% if temoins %} {# Check if the temoins QuerySet from context is not empty #}
+        <ul class="list-group mb-4">
+            {% for temoin in temoins %} {# Iterate over the Temoin objects #}
+            <li class="list-group-item">
+                <strong>{{ temoin.nom|default:"N/A" }}</strong> - {{ temoin.coordonnees|default:"N/A" }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">{% trans "No witnesses reported." %}</p>
+        {% endif %}
+        <hr>
+
+        <!-- Third Parties (Tiers Implique) -->
+        {% if incident.tiers %}
+        <h5 class="mt-4 mb-3"><i class="fas fa-user-tie me-2"></i>{% trans "Third Party Involved" %}</h5>
+        <dl class="row mb-4">
+            <dt class="col-sm-4">{% trans "Name" %}</dt>
+            <dd class="col-sm-8">{{ incident.tiers.nom|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Address" %}</dt>
+            <dd class="col-sm-8">{{ incident.tiers.adresse|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Insurance" %}</dt>
+            <dd class="col-sm-8">{{ incident.tiers.assurance|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Registration" %}</dt>
+            <dd class="col-sm-8">{{ incident.tiers.immatriculation|default:"N/A" }}</dd>
+        </dl>
+        <hr>
+        {% endif %}
+
         <!-- Documents Section -->
-        <h5 class="mb-3"><i class="fas fa-paperclip me-2"></i>{% trans "Documents" %}</h5>
+        <h5 class="mt-4 mb-3"><i class="fas fa-paperclip me-2"></i>{% trans "Documents" %}</h5>
         <ul class="list-group mb-4 text-wrap text-break">
-            {% for doc in incident.documents.all %}
+            {% for doc in documents %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-file-alt text-primary me-2"></i>
-                    <a href="{{ doc.file.url }}" target="_blank">{{ doc.file.name|basename }}</a>
+                    {% if doc.file.url %}
+                    <a href="{{ doc.file.url }}" target="_blank">{{ doc.original_name|basename }}</a>
+                    <small class="text-muted d-block">{{ doc.description }}</small>
+                    {% else %}
+                    {{ doc.original_name|basename }} (File Missing)
+                    <small class="text-danger d-block">{% trans "File not found." %}</small>
+                    {% endif %}
                 </div>
                 <small class="text-muted text-end">
-                    {{ doc.uploaded_by.name }}<br>
+                    {{ doc.uploaded_by.get_full_name }}<br>
                     <a href="mailto:{{ doc.uploaded_by.email }}">{{ doc.uploaded_by.email }}</a><br>
-                    {{ doc.uploaded_at|date:"SHORT_DATETIME_FORMAT" }}
+                    {{ doc.created_at|date:"SHORT_DATETIME_FORMAT" }}
                 </small>
             </li>
             {% empty %}
             <li class="list-group-item text-center text-muted">{% trans "No documents attached." %}</li>
             {% endfor %}
         </ul>
+        <hr>
+
+        <!-- Audit Details -->
+        {% if audit %}
+        <h5 class="mt-4 mb-3"><i class="fas fa-clipboard-check me-2"></i>{% trans "Audit Details" %}</h5>
+        <dl class="row mb-4">
+            <dt class="col-sm-4">{% trans "Auditor" %}</dt>
+            <dd class="col-sm-8">{{ audit.auditor.get_full_name }} ({{ audit.auditor.email }})</dd>
+            <dt class="col-sm-4">{% trans "Status" %}</dt>
+            <dd class="col-sm-8">{{ audit.get_status_display }}</dd>
+            <dt class="col-sm-4">{% trans "Decision" %}</dt>
+            <dd class="col-sm-8">{{ audit.get_decision_display|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Comments" %}</dt>
+            <dd class="col-sm-8">{{ audit.comments|linebreaksbr|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Started At" %}</dt>
+            <dd class="col-sm-8">{{ audit.started_at|date:"F j, Y H:i" }}</dd>
+            <dt class="col-sm-4">{% trans "Completed At" %}</dt>
+            <dd class="col-sm-8">{{ audit.completed_at|date:"F j, Y H:i"|default:"Not completed" }}</dd>
+        </dl>
+
+        {# Audit Checklist Items (if any) #}
+        {% if audit.checklist_items.all %}
+        <h6>{% trans "Audit Checklist Items" %}</h6>
+        <ul class="list-group mb-4">
+            {% for item in audit.checklist_items.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ item.question }}</strong>
+                    {% if item.comment %}<br><small class="text-muted">{{ item.comment }}</small>{% endif %}
+                </div>
+                <div>
+                    {% if item.answer %}
+                    <span class="badge bg-success">{% trans "Yes" %}</span>
+                    {% elif item.answer is False %}
+                    <span class="badge bg-danger">{% trans "No" %}</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{% trans "N/A" %}</span>
+                    {% endif %}
+                    {% if item.document_required %}<span class="badge bg-info ms-2">{% trans "Doc Req" %}</span>{% endif %}
+                    {% if item.document_received %}<span class="badge bg-primary ms-2">{% trans "Doc Rec" %}</span>{% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">{% trans "No checklist items for this audit." %}</p>
+        {% endif %}
+        <hr>
+        {% endif %}
+
+        <!-- Contentieux Details -->
+        {% if contentieux %}
+        <h5 class="mt-4 mb-3"><i class="fas fa-gavel me-2"></i>{% trans "Contentieux Details" %}</h5>
+        <dl class="row mb-4">
+            <dt class="col-sm-4">{% trans "Reference" %}</dt>
+            <dd class="col-sm-8">{{ contentieux.reference }}</dd>
+            <dt class="col-sm-4">{% trans "Subject" %}</dt>
+            <dd class="col-sm-8">{{ contentieux.subject.title|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Description" %}</dt>
+            <dd class="col-sm-8">{{ contentieux.subject.description|linebreaksbr|default:"N/A" }}</dd>
+            <dt class="col-sm-4">{% trans "Status" %}</dt>
+            <dd class="col-sm-8">{{ contentieux.get_status_display }}</dd>
+        </dl>
+
+        <h6>{% trans "Contentieux Documents" %}</h6>
+        <ul class="list-group mb-4">
+            {% for doc in contentieux.documents.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-file-alt text-success me-2"></i>
+                    {% if doc.file.url %}
+                    <a href="{{ doc.file.url }}" target="_blank">{{ doc.original_name|basename }}</a>
+                    <small class="text-muted d-block">{{ doc.description }}</small>
+                    {% else %}
+                    {{ doc.original_name|basename }} (File Missing)
+                    <small class="text-danger d-block">{% trans "File not found." %}</small>
+                    {% endif %}
+                </div>
+                <small class="text-muted text-end">
+                    {{ doc.uploaded_by.get_full_name }}<br>
+                    {{ doc.created_at|date:"SHORT_DATETIME_FORMAT" }}
+                </small>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-center text-muted">{% trans "No contentieux documents attached." %}</li>
+            {% endfor %}
+        </ul>
+
+        <h6>{% trans "Juridiction Steps" %}</h6>
+        <ul class="list-group mb-4">
+            {% for step in contentieux.juridiction_steps_set.all %}
+            <li class="list-group-item">
+                <strong>{{ step.get_juridiction_display }}</strong> on {{ step.submitted_at|date:"F j, Y" }}
+                {% if step.decision %}, Decision: {{ step.get_decision_display }} ({{ step.decision_at|date:"F j, Y"}}){% endif %}
+                {% if step.notes %}<br><small class="text-muted">{{ step.notes }}</small>{% endif %}
+            </li>
+            {% empty %}
+            <li class="list-group-item text-center text-muted">{% trans "No juridiction steps recorded." %}</li>
+            {% endfor %}
+        </ul>
+        <hr>
+        {% endif %}
+
     </div>
 </div>
 <!-- Back Button -->

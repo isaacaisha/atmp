@@ -81,7 +81,8 @@ class Action(models.Model):
 
 
 class Document(models.Model):
-    #contentieux = models.ForeignKey('Contentieux', on_delete=models.CASCADE, related_name='document_set')
+    # A document can be associated with a Contentieux (if it's litigation-related)
+    # or exist independently related to a DossierATMP via ManyToMany.
     contentieux = models.ForeignKey('Contentieux', on_delete=models.CASCADE, related_name='document_set', null=True, blank=True)
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='uploaded_documents')
     document_type = models.CharField(max_length=50, choices=DocumentType.choices)
@@ -102,26 +103,6 @@ class Document(models.Model):
         return self.original_name
 
 
-class UploadedFile(models.Model):
-    contentieux = models.ForeignKey('Contentieux', on_delete=models.CASCADE, related_name='documents_set')
-    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='uploaded_files_set')
-    document_type = models.CharField(max_length=50, choices=[(dt.value, dt.label) for dt in DocumentType])
-    original_name = models.CharField(max_length=255)
-    mime_type = models.CharField(max_length=100)
-    size = models.BigIntegerField()
-    filename = models.CharField(max_length=255, blank=True, null=True)
-    path = models.CharField(max_length=500, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = 'Uploaded File'
-        verbose_name_plural = 'Uploaded Files'
-
-    def __str__(self):
-        return self.original_name
-
-
 class DossierATMP(models.Model):
     reference = models.CharField(max_length=255, unique=True, blank=True)
     safety_manager = models.ForeignKey(User, on_delete=models.PROTECT, related_name='managed_dossiers')
@@ -136,9 +117,9 @@ class DossierATMP(models.Model):
     entreprise = models.JSONField(blank=True, null=True)
     salarie = models.JSONField(blank=True, null=True)
     accident = models.JSONField(blank=True, null=True)
-    temoins = models.JSONField(default=list, blank=True, null=True) # default=list is good, but also needs null=True
+    # REMOVED: temoins = models.JSONField(default=list, blank=True, null=True) 
     tiers_implique = models.JSONField(blank=True, null=True)
-    service_sante = models.CharField(max_length=255, blank=True, null=True) # already null=True
+    service_sante = models.CharField(max_length=255, blank=True, null=True)
 
     documents = models.ManyToManyField(Document, related_name='dossier_atmp_documents', blank=True)
 
@@ -155,18 +136,16 @@ class DossierATMP(models.Model):
             # Generate a unique reference if it's not set
             self.reference = f"ATMP-{timezone.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:8].upper()}"
 
-        # === IMPORTANT: Re-add the logic to convert empty dicts/lists to None ===
-        # This is crucial because your forms might return {} or [] for empty sub-forms,
-        # and you want to store NULL in the DB if they are truly empty.
+        # Convert empty JSONField dicts/lists to None for database storage if preferred
         if self.entreprise == {}:
             self.entreprise = None
         if self.salarie == {}:
             self.salarie = None
         if self.accident == {}:
             self.accident = None
-        if self.temoins == []: # If you want an empty list to be stored as NULL
-            self.temoins = None
-        if self.tiers_implique == {}: # If tiers_implique can also be an empty dict
+        # REMOVED: if self.temoins == []:
+        # REMOVED:    self.temoins = None
+        if self.tiers_implique == {}:
             self.tiers_implique = None
             
         super().save(*args, **kwargs)

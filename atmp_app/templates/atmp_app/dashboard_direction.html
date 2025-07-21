@@ -166,7 +166,7 @@
                 <ul class="list-group list-group-flush">
                     {% for manager in dossiers_by_safety_manager %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ manager.safety_manager__username|default:"Unassigned" }}
+                        {{ manager.safety_manager__email|default:"Unassigned" }}
                         <span class="badge badge-primary badge-pill">{{ manager.count }}</span>
                     </li>
                     {% empty %}

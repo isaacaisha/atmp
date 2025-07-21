@@ -17,7 +17,14 @@
     <div class="card-body">
         <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-            {{ form.non_field_errors }}
+            {# Display non-field errors from the main form #}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -35,15 +42,15 @@
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="{{ form.document_type.id_for_label }}" class="form-label">{% trans "Document Type" %}</label>
-                    {{ form.document_type|add_class:"form-control" }}
-                    <div class="text-danger small">{{ form.document_type.errors }}</div>
-                </div>
-
-                <div class="col-md-6 mb-3">
                     <label for="{{ form.status.id_for_label }}" class="form-label">{% trans "Status" %}</label>
                     {{ form.status|add_class:"form-control" }}
                     <div class="text-danger small">{{ form.status.errors }}</div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.service_sante.id_for_label }}" class="form-label">{% trans "Health Service" %}</label>
+                    {{ form.service_sante|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.service_sante.errors }}</div>
                 </div>
             </div>
 
@@ -69,7 +76,13 @@
 
             <div class="mb-4">
                 <h5 class="mt-4 mb-3 text-primary">{% trans "Company Details" %}</h5>
-                {{ form.entreprise_form.non_field_errors }}
+                {% if form.entreprise_form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.entreprise_form.non_field_errors %}
+                            {{ error }}<br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="{{ form.entreprise_form.name.id_for_label }}" class="form-label">{% trans "Company Name" %}</label>
@@ -92,7 +105,13 @@
 
             <div class="mb-4">
                 <h5 class="mt-4 mb-3 text-primary">{% trans "Employee Details" %}</h5>
-                {{ form.salarie_form.non_field_errors }}
+                {% if form.salarie_form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.salarie_form.non_field_errors %}
+                            {{ error }}<br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="{{ form.salarie_form.first_name.id_for_label }}" class="form-label">{% trans "First Name" %}</label>
@@ -103,6 +122,12 @@
                         <label for="{{ form.salarie_form.last_name.id_for_label }}" class="form-label">{% trans "Last Name" %}</label>
                         {{ form.salarie_form.last_name|add_class:"form-control" }}
                         <div class="text-danger small">{{ form.salarie_form.last_name.errors }}</div>
+                    </div>
+                     <div class="col-md-6 mb-3">
+                        <label for="{{ form.salarie_form.social_security_number.id_for_label }}" class="form-label">{% trans "Social Security Number" %}</label>
+                        {{ form.salarie_form.social_security_number|add_class:"form-control" }}
+                        <div class="form-text text-muted">{{ form.salarie_form.social_security_number.help_text }}</div>
+                        <div class="text-danger small">{{ form.salarie_form.social_security_number.errors }}</div>
                     </div>
                      <div class="col-md-6 mb-3">
                         <label for="{{ form.salarie_form.date_of_birth.id_for_label }}" class="form-label">{% trans "Date of Birth" %}</label>
@@ -119,12 +144,33 @@
 
             <div class="mb-4">
                 <h5 class="mt-4 mb-3 text-primary">{% trans "Accident Details" %}</h5>
-                {{ form.accident_form.non_field_errors }}
+                {% if form.accident_form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.accident_form.non_field_errors %}
+                            {{ error }}<br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
                 <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.accident_form.date.id_for_label }}" class="form-label">{% trans "Accident Date" %}</label>
+                        {{ form.accident_form.date|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.accident_form.date.errors }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.accident_form.time.id_for_label }}" class="form-label">{% trans "Accident Time" %}</label>
+                        {{ form.accident_form.time|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.accident_form.time.errors }}</div>
+                    </div>
                     <div class="col-md-6 mb-3">
                         <label for="{{ form.accident_form.type_of_accident.id_for_label }}" class="form-label">{% trans "Type of Accident" %}</label>
                         {{ form.accident_form.type_of_accident|add_class:"form-control" }}
                         <div class="text-danger small">{{ form.accident_form.type_of_accident.errors }}</div>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="{{ form.accident_form.description.id_for_label }}" class="form-label">{% trans "Short Description of Incident" %}</label>
+                        {{ form.accident_form.description|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.accident_form.description.errors }}</div>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label for="{{ form.accident_form.detailed_circumstances.id_for_label }}" class="form-label">{% trans "Detailed Circumstances" %}</label>
@@ -136,6 +182,11 @@
 
             <div class="row">
                 <div class="col-md-6 mb-3">
+                    <label for="{{ form.document_type.id_for_label }}" class="form-label">{% trans "Document Type (for file attachment)" %}</label>
+                    {{ form.document_type|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.document_type.errors }}</div>
+                </div>
+                <div class="col-md-6 mb-3">
                     <label for="{{ form.uploaded_file.id_for_label }}" class="form-label">{% trans "Attach File" %}</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-paperclip"></i></span>
@@ -146,7 +197,7 @@
                         {% trans "Allowed: PDF, DOC, JPG, PNG (max 10MB)" %}
                     </div>
                 </div>
-                <div class="col-md-6 mb-3"">
+                <div class="col-md-12 mb-3">
                     <label for="{{ form.document_description.id_for_label }}" class="form-label">{% trans "File Description" %}</label>
                     {{ form.document_description|add_class:"form-control" }}
                     <div class="text-danger small">{{ form.document_description.errors }}</div>

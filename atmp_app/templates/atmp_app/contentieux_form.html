@@ -3,16 +3,16 @@
 {% extends "base.html" %}
 {% load i18n crispy_forms_tags %}
 
-{% block title %}{% if form.instance.pk %}{% trans "Edit Contentieux" %}{% else %}{% trans "Create Contentieux" %}{% endif %}{% endblock %}
+{% block title %}{% if form.instance.pk %}{% trans "Edit Contentieux" %}{% else %}{% trans "Create Contentieux" %}{%endif %}{% endblock %}
 
 {% block content %}
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">
         {% if form.instance.pk %}
-            <i class="fas fa-edit me-2"></i>{% trans "Edit Contentieux" %}
+        <i class="fas fa-edit me-2"></i>{% trans "Edit Contentieux" %}
         {% else %}
-            <i class="fas fa-plus-circle me-2"></i>{% trans "Create Contentieux" %}
+        <i class="fas fa-plus-circle me-2"></i>{% trans "Create Contentieux" %}
         {% endif %}
     </h1>
 </div>
@@ -25,38 +25,57 @@
         </h6>
     </div>
     <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" novalidate> {# Added novalidate to allow custom validation #}
             {% csrf_token %}
-            
+            {{ form.non_field_errors }} {# Display form-wide errors #}
+
             <div class="row">
                 <div class="col-md-6">
+                    {# reference field is likely read-only, ensure it's displayed correctly #}
+                    {% if form.instance.reference %}
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "Reference" %}</label>
+                        <input type="text" class="form-control" value="{{ form.instance.reference }}" readonly>
+                    </div>
+                    {% else %}
+                    {# If reference is generated on save, it might not be in the form. #}
+                    {# If it's a field in the form, render it like this: #}
                     {{ form.reference|as_crispy_field }}
+                    {% endif %}
                 </div>
                 <div class="col-md-6">
                     {{ form.status|as_crispy_field }}
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-12">
                     <h5 class="mt-4 mb-3">{% trans "Subject Details" %}</h5>
                     <div class="border p-3 mb-3">
                         {{ form.subject|as_crispy_field }}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-12">
-                    <h5 class="mt-4 mb-3">{% trans "Juridiction Steps" %}</h5>
-                    <div class="border p-3 mb-3">
-                        {{ form.juridiction_steps|as_crispy_field }}
+                        {# If you have nested JSON fields, render their sub-forms here if they exist #}
                     </div>
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="mt-4 mb-3">{% trans "Juridiction Steps" %}</h5>
+                    <div class="border p-3 mb-3">
+                        {# Display juridiction_steps as a textarea for JSON input #}
+                        {{ form.juridiction_steps|as_crispy_field }}
+                        <small class="form-text text-muted">{% trans "Enter JSON for juridiction steps. E.g., {'step1':
+                            {'type': 'TRIBUNAL_JUDICIAIRE', 'date': 'YYYY-MM-DD'}}" %}</small>
+                    </div>
+                </div>
+            </div>
+
+            {# Hidden field for dossier_atmp which is pre-populated in `get_initial` #}
+            {{ form.dossier_atmp }}
+
             <div class="d-flex justify-content-between mt-4">
-                <a href="{% url 'atmp_app:incident-detail' pk=form.instance.dossier_atmp.pk %}" class="btn btn-outline-secondary">
+                {# Use the dossier_pk passed to the view (or available from self.dossier if set in dispatch) #}
+                <a href="{% url 'atmp_app:incident-detail' pk=dossier_pk %}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i> {% trans "Cancel" %}
                 </a>
                 <button type="submit" class="btn btn-primary">

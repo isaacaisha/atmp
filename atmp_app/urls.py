@@ -9,12 +9,10 @@ from .auth_views import AuthViewSet
 from .views_api import (
     CustomAPIRootView,
     CustomDefaultRouter,
-    #DocumentUploadView,
     DossierViewSet,
     ContentieuxViewSet,
     AuditViewSet,
     DocumentViewSet,
-    #RootAPIView,
     get_jurist_dashboard_data,
     get_rh_dashboard_data,
     get_qse_dashboard_data,
@@ -29,7 +27,7 @@ from .views import (
     IncidentUpdateView,
     IncidentDeleteView,
     ContentieuxCreateView,
-    DocumentUploadView,
+    DocumentUploadView, # HTML view for document upload
     JuridiqueDashboardHTMLView,
     RHDashboardHTMLView,
     QSEDashboardHTMLView,
@@ -49,7 +47,7 @@ router.register(r'documents', DocumentViewSet, basename='document')
 urlpatterns = [
     # ─── API ───────────────────────────────────────────────────────
     path('api/', include(router.urls)),
-    # API Dashboard endpoints
+    # API Dashboard endpoints (keeping these as function views for specific data access)
     path('api/dashboard/juridique/', get_jurist_dashboard_data, name='jurist_dashboard_data'),
     path('api/dashboard/rh/', get_rh_dashboard_data, name='rh_dashboard_data'),
     path('api/dashboard/qse/', get_qse_dashboard_data, name='qse_dashboard_data'),
@@ -67,7 +65,7 @@ urlpatterns = [
     # Contentieux routes
     path('incidents/<int:dossier_pk>/contentieux/create/', ContentieuxCreateView.as_view(), name='contentieux-create'),
     
-    # Document routes
+    # Document routes (HTML view for document upload)
     path('incidents/<int:incident_pk>/documents/upload/', DocumentUploadView.as_view(), name='document-upload'),
 
     # HTML Dashboard Actions Routes

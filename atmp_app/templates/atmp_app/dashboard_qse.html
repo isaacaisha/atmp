@@ -98,6 +98,9 @@
                 <ul class="list-group list-group-flush">
                     {% for status in incidents_by_status %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {# Assuming status.status is the raw enum value, which might not be human-readable. #}
+                        {# If you need the display value, you'd have to map it in the view's context. #}
+                        {# For now, just show the raw value. #}
                         {{ status.status }}
                         <span class="badge badge-primary badge-pill">{{ status.count }}</span>
                     </li>

@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model # <--- Get Django's active User model
 from .models import (
     DossierATMP, Contentieux, Audit, Document, 
-    JuridictionStep, Temoin, Tiers, Action, UploadedFile,
+    JuridictionStep, Temoin, Tiers, Action,
     AuditDecision, AuditStatus, ContentieuxStatus,
     JuridictionType, DocumentType, DossierStatus, AuditChecklistItem
 )
@@ -152,38 +152,7 @@ class TiersSerializer(serializers.ModelSerializer):
         fields = ['id', 'nom', 'adresse', 'assurance', 'immatriculation']
 
 
-# --- UploadedFile Serializer (Now a ModelSerializer) ---
-class UploadedFileSerializer(serializers.ModelSerializer):
-    # Write-only input
-    contentieux = serializers.PrimaryKeyRelatedField(queryset=Contentieux.objects.all(), write_only=True)
-    uploaded_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True)
-
-    # Read-only output
-    contentieux_id = serializers.PrimaryKeyRelatedField(read_only=True, source='contentieux')
-    uploaded_by_id = serializers.PrimaryKeyRelatedField(read_only=True, source='uploaded_by')
-
-    class Meta:
-        model = UploadedFile
-        fields = '__all__'
-        read_only_fields = (
-            'id', 'created_at', 'updated_at',
-            'filename', 'path', 'size',
-            'contentieux_id', 'uploaded_by_id',
-        )
-
-    def create(self, validated_data):
-        """
-        Create UploadedFile instance. If you need to programmatically
-        assign related fields like contentieux or uploaded_by,
-        you can do it here.
-        """
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        """
-        Optional: update logic.
-        """
-        return super().update(instance, validated_data)
+# Removed UploadedFileSerializer (as UploadedFile model is removed)
 
 
 class DossierATMPSerializer(serializers.ModelSerializer):
@@ -196,7 +165,7 @@ class DossierATMPSerializer(serializers.ModelSerializer):
     contentieux = ContentieuxSerializer(read_only=True)
     audit = AuditSerializer(read_only=True)
     temoins = TemoinSerializer(many=True, read_only=True)
-    tiers = TiersSerializer(read_only=True)
+    tiers = serializers.SerializerMethodField()
     documents = DocumentSerializer(many=True, read_only=True)
 
     class Meta:
@@ -210,6 +179,12 @@ class DossierATMPSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['reference', 'created_at', 'contentieux', 'audit']
 
+    def get_tiers(self, obj):
+        try:
+            return TiersSerializer(obj.tiers).data
+        except DossierATMP.tiers.RelatedObjectDoesNotExist:
+            return None
+            
     def validate_entreprise(self, value):
         required_fields = ['name', 'siret', 'address']
         for field in required_fields:
@@ -218,6 +193,7 @@ class DossierATMPSerializer(serializers.ModelSerializer):
         return value
 
     def validate_salarie(self, value):
+        # Added 'social_security_number' to required fields based on forms and common use
         required_fields = ['first_name', 'last_name', 'social_security_number']
         for field in required_fields:
             if field not in value:
@@ -225,6 +201,7 @@ class DossierATMPSerializer(serializers.ModelSerializer):
         return value
 
     def validate_accident(self, value):
+        # Added 'date', 'time', 'description' to required fields based on forms and common use
         required_fields = ['date', 'time', 'description']
         for field in required_fields:
             if field not in value:
@@ -233,14 +210,15 @@ class DossierATMPSerializer(serializers.ModelSerializer):
 
 # Special serializers for write operations
 class DossierCreateSerializer(DossierATMPSerializer):
+    # Override safety_manager to accept primary key for creation
     safety_manager = serializers.PrimaryKeyRelatedField(
         queryset=CustomUser.objects.filter(role='SAFETY_MANAGER')
     )
     
-    class Meta:
-        model = DossierATMP
+    class Meta(DossierATMPSerializer.Meta): # Inherit Meta from parent
         fields = [
             'safety_manager', 'title', 'description',
             'date_of_incident', 'location', 'entreprise',
             'salarie', 'accident', 'service_sante'
         ]
+        read_only_fields = [] # Ensure no read-only fields that should be writable on creation

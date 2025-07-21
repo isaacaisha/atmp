@@ -11,8 +11,10 @@ from atmp_app.models import (
     Document, DocumentType,
     Audit, AuditStatus, AuditDecision,
     Action,
+    Temoin,
+    Tiers
 )
-from users.models import CustomUser as User
+from users.models import CustomUser as User, UserRole
 
 
 class Command(BaseCommand):
@@ -23,6 +25,8 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             # 1) wipe existing data
+            Temoin.objects.all().delete()
+            Tiers.objects.all().delete()
             Audit.objects.all().delete()
             Contentieux.objects.all().delete()
             DossierATMP.objects.all().delete()
@@ -31,70 +35,102 @@ class Command(BaseCommand):
             User.objects.all().delete()
             self.stdout.write("🗑️  Cleared old rows")
 
-            # 2) Create users via create_user (no username field!)
+            # 2) Create users
             admin = User.objects.create_user(
                 email='admin@example.com',
                 password='secret',
                 name='Admin User',
-                role='ADMIN',
+                role=UserRole.ADMIN,
                 is_staff=True,
                 is_superuser=True
             )
+            # FIX: Change UserRole.JURIST to UserRole.JURISTE
             juriste = User.objects.create_user(
                 email='juriste@example.com',
                 password='juriste123',
                 name='Juriste Alpha',
-                role='JURISTE'
+                role=UserRole.JURISTE # <-- Corrected: Use JURISTE
             )
             rh = User.objects.create_user(
                 email='rh@example.com',
                 password='rh123',
                 name='RH Beta',
-                role='RH'
+                role=UserRole.RH
+            )
+            safety_manager = User.objects.create_user(
+                email='safety@example.com',
+                password='safety123',
+                name='Safety Manager Gamma',
+                role=UserRole.SAFETY_MANAGER
+            )
+            employee = User.objects.create_user(
+                email='employee@example.com',
+                password='employee123',
+                name='Employee Delta',
+                role=UserRole.EMPLOYEE
             )
             self.stdout.write(self.style.SUCCESS("✅ Users created"))
 
             # 3) Dossier ATMP
             dossier = DossierATMP.objects.create(
-                reference=f"DAT-{int(datetime.now().timestamp())}",
                 status=DossierStatus.A_ANALYSER,
-                created_by=rh,
-                safety_manager=juriste,
-                date_of_incident=timezone.now().date(),    # <<< ADD THIS
+                created_by=employee,
+                safety_manager=safety_manager,
+                date_of_incident=timezone.now().date(),
                 title="Chute",
                 description="Dans les escaliers",
                 location="Siège social, Paris",
                 entreprise={
+                    'name': 'Entreprise Alpha',
                     'siret': '12345678900001',
-                    'raisonSociale': 'Entreprise Alpha',
-                    'adresse': '123 Rue de la Paix, Paris',
+                    'address': '123 Rue de la Paix, Paris',
                     'numeroRisque': '123AB'
                 },
                 salarie={
-                    'nom': 'Dupont',
-                    'prenom': 'Jean',
-                    'dateNaissance': '1980-05-15',
-                    'numeroSecu': '180057512345678',
-                    'adresse': '456 Avenue des Champs, Paris',
-                    'horairesTravail': '9h-17h'
+                    'first_name': 'Jean',
+                    'last_name': 'Dupont',
+                    'social_security_number': '180057512345678',
+                    'date_of_birth': '1980-05-15',
+                    'job_title': 'Technicien'
                 },
                 accident={
                     'date': '2024-06-01',
-                    'heure': '10:30',
-                    'lieu': 'Atelier',
-                    'circonstances': "Chute d'un objet lourd",
-                    'descriptionLesions': 'Fracture du pied droit'
+                    'time': '10:30',
+                    'description': "Chute d'un objet lourd, fracture du pied droit",
+                    'type_of_accident': 'Chute d\'objet',
+                    'detailed_circumstances': "L'employé a chuté en manipulant un objet lourd."
                 },
-                temoins=[],
                 tiers_implique=None,
                 service_sante='Service de Santé au Travail'
             )
             self.stdout.write(self.style.SUCCESS(f"✅ DossierATMP {dossier.reference}"))
 
+            # Create Temoin objects linked to the dossier
+            Temoin.objects.create(
+                dossier_atmp=dossier,
+                nom="Alice Smith",
+                coordonnees="alice.s@example.com, 0612345678"
+            )
+            Temoin.objects.create(
+                dossier_atmp=dossier,
+                nom="Bob Johnson",
+                coordonnees="bob.j@example.com"
+            )
+            self.stdout.write(self.style.SUCCESS("✅ Temoin objects created and linked to Dossier"))
+
+            # Create Tiers object linked to the dossier
+            Tiers.objects.create(
+                dossier_atmp=dossier,
+                nom="XYZ Company",
+                adresse="789 Business Road, Paris",
+                assurance="Axa Assurance",
+                immatriculation="FR123456789"
+            )
+            self.stdout.write(self.style.SUCCESS("✅ Tiers object created and linked to Dossier"))
+
             # 4) Contentieux
             content = Contentieux.objects.create(
                 dossier_atmp=dossier,
-                reference=f"CONT-{int(datetime.now().timestamp())}",
                 subject={
                     'title': f"Contentieux {dossier.reference}",
                     'description': f"Initiated after audit of {dossier.reference}"
@@ -114,15 +150,16 @@ class Command(BaseCommand):
                 size=500_000
             )
             content.documents.add(doc)
-            self.stdout.write(self.style.SUCCESS("✅ Document linked to Contentieux"))
+            dossier.documents.add(doc)
+            self.stdout.write(self.style.SUCCESS("✅ Document linked to Contentieux and Dossier"))
 
             # 6) Audit
             audit = Audit.objects.create(
                 dossier_atmp=dossier,
-                auditor=juriste,
+                auditor=safety_manager,
                 status=AuditStatus.IN_PROGRESS,
                 decision=None,
-                comments='',
+                comments='Initial audit in progress.',
                 started_at=timezone.now(),
                 completed_at=None
             )

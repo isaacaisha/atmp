@@ -33,6 +33,8 @@ class UserRole(models.TextChoices):
     RH = 'RH', 'Resources Humaines'
     MANAGER = 'MANAGER', 'Manager'
     SAFETY_MANAGER = 'SAFETY_MANAGER', 'Safety Manager'
+    QSE = 'QS', 'Quality, Safety, Environment'
+    DIRECTION = 'DR', 'Direction'
     EMPLOYEE = 'EMPLOYEE', 'Employee'
 
 

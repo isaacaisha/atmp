@@ -51,3 +51,7 @@ class CustomAuthenticationForm(AuthenticationForm):
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(
         attrs={'data-size': 'compact'}
     ))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        

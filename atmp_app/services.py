@@ -30,6 +30,8 @@ class ContentieuxService:
         """
         try:
             # Generate a simple reference for the contentieux
+            # The model's save method will also generate one if not provided,
+            # but providing a prefix here can be useful for human readability.
             reference = f"CONT-{int(datetime.now().timestamp())}"
 
             new_contentieux = Contentieux(
