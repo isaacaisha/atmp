@@ -29,7 +29,7 @@
     </li>
 
     {% if user.is_authenticated %}
-        {% if user.is_superuser or user.role == 'juridique' %}
+        {% if user.is_superuser or user.role == 'JURISTE' %}
         <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-juridique' %}active{% endif %}">
             <a class="nav-link" href="{% url 'atmp_app:dashboard-juridique' %}">
                 <i class="fas fa-fw fa-gavel"></i> {# Icon for legal/juridique #}
@@ -38,7 +38,7 @@
         </li>
         {% endif %}
 
-        {% if user.is_superuser or user.role == 'rh' %}
+        {% if user.is_superuser or user.role == 'RH' %}
         <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-rh' %}active{% endif %}">
             <a class="nav-link" href="{% url 'atmp_app:dashboard-rh' %}">
                 <i class="fas fa-fw fa-users"></i> {# Icon for HR #}
@@ -47,7 +47,7 @@
         </li>
         {% endif %}
 
-        {% if user.is_superuser or user.role == 'qse' %}
+        {% if user.is_superuser or user.role == 'QSE' %}
         <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-qse' %}active{% endif %}">
             <a class="nav-link" href="{% url 'atmp_app:dashboard-qse' %}">
                 <i class="fas fa-fw fa-shield-alt"></i> {# Icon for QSE #}
@@ -56,7 +56,7 @@
         </li>
         {% endif %}
 
-        {% if user.is_superuser or user.role == 'direction' %}
+        {% if user.is_superuser or user.role == 'DIRECTION' %}
         <li class="nav-item {% if request.resolver_match.url_name == 'dashboard-direction' %}active{% endif %}">
             <a class="nav-link" href="{% url 'atmp_app:dashboard-direction' %}">
                 <i class="fas fa-fw fa-chart-line"></i> {# Icon for Direction #}
@@ -69,6 +69,43 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
 
+    {# If you have other nav items that should appear after the dashboards #}
+    {# For example, for Incident Creation or Listing: #}
+    {% if user.is_authenticated %}
+        <li class="nav-item {% if request.resolver_match.url_name == 'incident-list' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'atmp_app:incident-list' %}">
+                <i class="fas fa-fw fa-clipboard-list"></i>
+                <span>{% trans "Incidents List" %}</span>
+            </a>
+        </li>
+        <li class="nav-item {% if request.resolver_match.url_name == 'incident-create' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'atmp_app:incident-create' %}">
+                <i class="fas fa-fw fa-plus-circle"></i>
+                <span>{% trans "Report New Incident" %}</span>
+            </a>
+        </li>
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+        {# Link to profile page #}
+        <li class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+            <a class="nav-link" href="{% url 'atmp_app:profile' %}">
+                <i class="fas fa-fw fa-user"></i>
+                <span>{% trans "My Profile" %}</span>
+            </a>
+        </li>
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+    {% endif %}
+    {# If you have other elements, continue them here #}
+
+    <!-- Sidebar Toggler (if you have one) -->
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+    
     <!-- Heading -->
     <div class="sidebar-heading">
         {% trans 'Interface' %}

@@ -46,9 +46,6 @@ PROXY = {
     'https': 'http://127.0.0.1:8080',
 }
 
-# Admins (for 500 error notifications)
-#ADMINS = [('Medusa', 'medusadbt@gmail.com')]
-
 # SSL & Security settings
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
@@ -278,8 +275,8 @@ else:
 #LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # URL settings for 2FA
-LOGIN_URL = 'two_factor:login'
-#LOGIN_URL = reverse_lazy('users:login')
+#LOGIN_URL = 'two_factor:login'
+LOGIN_URL = reverse_lazy('users:login')
 LOGIN_REDIRECT_URL = reverse_lazy('atmp_app:dashboard')
 LOGOUT_REDIRECT_URL = reverse_lazy('users:login')
 
