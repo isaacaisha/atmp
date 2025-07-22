@@ -452,7 +452,7 @@ class JuridiqueDashboardHTMLView(LoginRequiredMixin, UserPassesTestMixin, Templa
     template_name = 'atmp_app/dashboard_juridique.html'
     
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.role == UserRole.JURIST
+        return self.request.user.is_superuser or self.request.user.role == UserRole.JURISTE
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

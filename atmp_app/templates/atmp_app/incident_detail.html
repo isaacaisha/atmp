@@ -167,11 +167,11 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-file-alt text-primary me-2"></i>
-                    {% if doc.file.url %}
+                    {% if doc.file %}
                     <a href="{{ doc.file.url }}" target="_blank">{{ doc.original_name|basename }}</a>
                     <small class="text-muted d-block">{{ doc.description }}</small>
                     {% else %}
-                    {{ doc.original_name|basename }} (File Missing)
+                    {{ doc.original_name|default:''|basename }} (File Missing)
                     <small class="text-danger d-block">{% trans "File not found." %}</small>
                     {% endif %}
                 </div>
@@ -266,11 +266,11 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-file-alt text-success me-2"></i>
-                    {% if doc.file.url %}
+                    {% if doc.file %}
                     <a href="{{ doc.file.url }}" target="_blank">{{ doc.original_name|basename }}</a>
                     <small class="text-muted d-block">{{ doc.description }}</small>
                     {% else %}
-                    {{ doc.original_name|basename }} (File Missing)
+                    {{ doc.original_name|default:''|basename }} (File Missing)
                     <small class="text-danger d-block">{% trans "File not found." %}</small>
                     {% endif %}
                 </div>

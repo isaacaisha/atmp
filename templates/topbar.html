@@ -171,9 +171,22 @@
                 <div class="dropdown-divider"></div>
                 {% endif %}
 
+                {% if request.user.is_superuser %}
+                <a class="dropdown-item" href="/atmp/api/">
+                    <i class="fas fa-plug fa-sm fa-fw mr-2 text-gray-400"></i>
+                    {% trans 'API' %}
+                </a>
+                <div class="dropdown-divider"></div>
+                {% endif %}
+
                 <a class="dropdown-item" href="{% url 'atmp_app:profile' %}">
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     {% trans 'Profile' %}
+                </a>
+
+                <a class="dropdown-item" href="#">
+                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                    {% trans 'Settings' %}
                 </a>
 
                 <a class="dropdown-item" href="{% url 'users:profile' %}">
@@ -182,21 +195,10 @@
                 </a>
 
                 <a class="dropdown-item" href="#">
-                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                    {% trans 'Settings' %}
-                </a>
-
-                {% if request.user.is_superuser %}
-                <a class="dropdown-item" href="/atmp/api/">
-                    <i class="fas fa-plug fa-sm fa-fw mr-2 text-gray-400"></i>
-                    {% trans 'API' %}
-                </a>
-                {% endif %}
-                
-                <a class="dropdown-item" href="#">
                     <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
                     {% trans 'Activity Log' %}
                 </a>
+
                 <div class="dropdown-divider"></div>
                 <!--<a class="dropdown-item" href="{% url 'users:logout' %}" data-toggle="modal" data-target="#logoutModal">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>

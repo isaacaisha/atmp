@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     # 1) my custom user app
     'users',
@@ -105,6 +106,9 @@ INSTALLED_APPS = [
     # 4) Recaptcha
     'django_recaptcha',
 ]
+
+# My domain ID
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
