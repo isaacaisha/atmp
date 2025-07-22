@@ -161,7 +161,7 @@
         {% endif %}
 
         <!-- Documents Section -->
-        <h5 class="mt-4 mb-3"><i class="fas fa-paperclip me-2"></i>{% trans "Documents" %}</h5>
+        <h5 class="mt-4 mb-3"><i class="fas fa-paperclip me-2"></i>{% trans "Incident Documents" %}</h5>
         <ul class="list-group mb-4 text-wrap text-break">
             {% for doc in documents %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -180,6 +180,17 @@
                     <a href="mailto:{{ doc.uploaded_by.email }}">{{ doc.uploaded_by.email }}</a><br>
                     {{ doc.created_at|date:"SHORT_DATETIME_FORMAT" }}
                 </small>
+                {# Conditional display of delete button #}
+                {% if request.user.is_superuser or request.user == doc.uploaded_by %}
+                <form action="{% url 'atmp_app:document_delete' pk=doc.pk %}" method="post"
+                    onsubmit="return confirm('Are you sure you want to delete this document? This action cannot be undone.');"
+                    class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="{% trans 'Delete Document' %}">
+                        ✘
+                    </button>
+                </form>
+                {% endif %}
             </li>
             {% empty %}
             <li class="list-group-item text-center text-muted">{% trans "No documents attached." %}</li>
@@ -265,8 +276,20 @@
                 </div>
                 <small class="text-muted text-end">
                     {{ doc.uploaded_by.get_full_name }}<br>
+                    <a href="mailto:{{ doc.uploaded_by.email }}">{{ doc.uploaded_by.email }}</a><br>
                     {{ doc.created_at|date:"SHORT_DATETIME_FORMAT" }}
                 </small>
+                {# Conditional display of delete button #}
+                {% if request.user.is_superuser or request.user == doc.uploaded_by %}
+                <form action="{% url 'atmp_app:document_delete' pk=doc.pk %}" method="post"
+                    onsubmit="return confirm('Are you sure you want to delete this document? This action cannot be undone.');"
+                    class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="{% trans 'Delete Document' %}">
+                        ✘
+                    </button>
+                </form>
+                {% endif %}
             </li>
             {% empty %}
             <li class="list-group-item text-center text-muted">{% trans "No contentieux documents attached." %}</li>

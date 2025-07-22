@@ -21,13 +21,15 @@ from .views_api import (
 
 from .views import (
     DashboardView,
+    ProfileView,
     IncidentCreateView,
     IncidentListView,
     IncidentDetailView,
     IncidentUpdateView,
     IncidentDeleteView,
     ContentieuxCreateView,
-    DocumentUploadView, # HTML view for document upload
+    DocumentUploadView,
+    DocumentDeleteView,
     JuridiqueDashboardHTMLView,
     RHDashboardHTMLView,
     QSEDashboardHTMLView,
@@ -56,6 +58,7 @@ urlpatterns = [
     # ─── HTML frontend ────────────────────────────────────────────
     path('', RedirectView.as_view(pattern_name='atmp_app:dashboard', permanent=False)),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('profile/', ProfileView.as_view(), name='profile'),
     path('incidents/', IncidentListView.as_view(), name='incident-list'),
     path('incidents/create/', IncidentCreateView.as_view(), name='incident-create'),
     path('incidents/<int:pk>/', IncidentDetailView.as_view(), name='incident-detail'),
@@ -67,6 +70,7 @@ urlpatterns = [
     
     # Document routes (HTML view for document upload)
     path('incidents/<int:incident_pk>/documents/upload/', DocumentUploadView.as_view(), name='document-upload'),
+    path('documents/<int:pk>/delete/', DocumentDeleteView.as_view(), name='document_delete'),
 
     # HTML Dashboard Actions Routes
     path('dashboard/juridique/', JuridiqueDashboardHTMLView.as_view(), name='dashboard-juridique'),

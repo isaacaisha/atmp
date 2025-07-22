@@ -32,7 +32,6 @@
             </div>
         </div>
 
-        {% if user.role == 'employee' or user.is_superuser %}
         {# Report Incident Card (only for employees and superusers) #}
         <div class="col-xl-6 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2">
@@ -51,14 +50,13 @@
                 </div>
             </div>
         </div>
-        {% endif %}
-    </div> {# End of dynamic row #}
+    </div>
 
     {% else %}
     <!-- Not Authenticated Block -->
     <div class="card shadow-sm mb-5">
         <div class="card-body">
-            <h1 class="mb-4 text-center text-warning">{% trans "You’re not logged in. Please" %}</h1>
+            <h1 class="mb-4 text-center text-warning">{% trans "You’re not logged in. Please," %}</h1>
             <div class="d-grid gap-2 d-flex justify-content-between">
                 <a href="{% url 'users:login' %}" class="btn btn-primary">
                     {% trans "Login" %}
@@ -70,12 +68,6 @@
         </div>
     </div>
 
-    {# Original dashboard content for non-authenticated users or as fallback - removed for brevity #}
-    {# The following section was likely for a generic non-authenticated dashboard,
-    which often duplicates content from an admin template.
-    It's generally better to either remove it or make it genuinely dynamic/relevant.
-    For this refactor, I'm commenting it out, assuming the authenticated dashboards are the priority. #}
-    {% comment %}
     <!-- Page Heading (Example: for non-authenticated general content) -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">{% trans 'Dashboard' %}</h1>
@@ -372,7 +364,6 @@
 
         </div>
     </div>
-    {% endcomment %}
     {% endif %}
 
 </div>

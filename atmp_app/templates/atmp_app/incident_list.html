@@ -54,11 +54,14 @@
             {% endcomment %}
             {% if user.is_superuser or inc.created_by == user or inc.safety_manager == user %}
             <th scope="col" style="position: sticky; top: 0; z-index: 1; white-space: nowrap;">
-              <i class="fa fa-pen-square me-1"></i> {% trans "Edit" %}
+              {% trans "Detail" %}
+            </th>
+            <th scope="col" style="position: sticky; top: 0; z-index: 1; white-space: nowrap;">
+              {% trans "Edit" %}
             </th>
             <th scope="col"
               style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 1; white-space: nowrap;">
-              <i class="fa fa-trash me-1"></i> {% trans "Delete" %}
+              {% trans "Delete" %}
             </th>
             {% endif %}
           </tr>
@@ -78,12 +81,17 @@
               </div>
             </td>
             {% if user.is_superuser or inc.created_by == user or inc.safety_manager == user %}
-            <td>
+            <td class="text-center">
+              <a href="{% url 'atmp_app:incident-detail' inc.pk %}" class="text-decoration-none text-primary">
+                <i class="fa fa-search"></i>
+              </a>
+            </td>
+            <td class="text-center">
               <a href="{% url 'atmp_app:incident-update' inc.pk %}" class="text-decoration-none text-warning">
                 <i class="fa fa-pen-square"></i>
               </a>
             </td>
-            <td>
+            <td class="text-center">
               <a href="{% url 'atmp_app:incident-delete' inc.pk %}" class="text-decoration-none text-danger">
                 <i class="fa fa-trash"></i>
               </a>
@@ -104,9 +112,8 @@
 </div>
 <!-- Back Button -->
 <div class="text-center">
-  <a href="{% url 'atmp_app:dashboard' %}" class="btn btn-outline-secondary"
-    onclick="window.history.back(); return false;">
-    <i class="fas fa-arrow-left me-2"></i> {% trans "Go Back" %}
+  <a href="{% url 'atmp_app:dashboard' %}" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-2"></i> {% trans "Back to Dashboard" %}
   </a>
 </div>
 {% endblock %}

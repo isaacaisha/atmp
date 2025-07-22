@@ -78,6 +78,7 @@
                             <th>{% trans "Description" %}</th> {# Added description column #}
                             <th>{% trans "Uploaded By" %}</th>
                             <th>{% trans "Date" %}</th>
+                            <th>{% trans "Delete" %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,8 +96,21 @@
                                 {% endif %}
                             </td>
                             <td>{{ doc.description|default:"-" }}</td> {# Display description #}
-                            <td>{{ doc.uploaded_by.get_full_name }}</td>
+                            <td>{{ doc.uploaded_by.name }}</td>
                             <td>{{ doc.created_at|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td class="text-center">
+                                {# Conditional display of delete button #}
+                                {% if request.user.is_superuser or request.user == doc.uploaded_by %}
+                                <form action="{% url 'atmp_app:document_delete' pk=doc.pk %}" method="post"
+                                    onsubmit="return confirm('Are you sure you want to delete this document? This action cannot be undone.');"
+                                    class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="{% trans 'Delete Document' %}">
+                                        ✘
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

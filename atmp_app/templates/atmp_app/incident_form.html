@@ -5,7 +5,7 @@
 
 {% block title %}{% trans "Report Incident" %}{% endblock %}
 
-{% block content %}
+{% block content %} {# <-- THIS BLOCK IS OPENED HERE #}
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">{% trans "New ATMP Incident" %}</h1>
 </div>
@@ -19,11 +19,11 @@
             {% csrf_token %}
             {# Display non-field errors from the main form #}
             {% if form.non_field_errors %}
-                <div class="alert alert-danger" role="alert">
-                    {% for error in form.non_field_errors %}
-                        {{ error }}<br>
-                    {% endfor %}
-                </div>
+            <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors %}
+                {{ error }}<br>
+                {% endfor %}
+            </div>
             {% endif %}
 
             <div class="row">
@@ -46,7 +46,7 @@
                     {{ form.status|add_class:"form-control" }}
                     <div class="text-danger small">{{ form.status.errors }}</div>
                 </div>
-                
+
                 <div class="col-md-6 mb-3">
                     <label for="{{ form.service_sante.id_for_label }}" class="form-label">{% trans "Health Service" %}</label>
                     {{ form.service_sante|add_class:"form-control" }}
@@ -59,7 +59,7 @@
                 {{ form.description|add_class:"form-control" }}
                 <div class="text-danger small">{{ form.description.errors }}</div>
             </div>
-            
+
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="{{ form.date_of_incident.id_for_label }}" class="form-label">{% trans "Date of Incident" %}</label>
@@ -74,14 +74,15 @@
                 </div>
             </div>
 
+            {# --- Company Details Section (Existing) --- #}
             <div class="mb-4">
                 <h5 class="mt-4 mb-3 text-primary">{% trans "Company Details" %}</h5>
                 {% if form.entreprise_form.non_field_errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {% for error in form.entreprise_form.non_field_errors %}
-                            {{ error }}<br>
-                        {% endfor %}
-                    </div>
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.entreprise_form.non_field_errors %}
+                    {{ error }}<br>
+                    {% endfor %}
+                </div>
                 {% endif %}
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -94,23 +95,24 @@
                         {{ form.entreprise_form.address|add_class:"form-control" }}
                         <div class="text-danger small">{{ form.entreprise_form.address.errors }}</div>
                     </div>
-                     <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="{{ form.entreprise_form.siret.id_for_label }}" class="form-label">{% trans "SIRET Number" %}</label>
                         {{ form.entreprise_form.siret|add_class:"form-control" }}
                         <div class="form-text text-muted">{{ form.entreprise_form.siret.help_text }}</div>
                         <div class="text-danger small">{{ form.entreprise_form.siret.errors }}</div>
                     </div>
-                    </div>
+                </div>
             </div>
 
+            {# --- Employee Details Section (Existing) --- #}
             <div class="mb-4">
                 <h5 class="mt-4 mb-3 text-primary">{% trans "Employee Details" %}</h5>
                 {% if form.salarie_form.non_field_errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {% for error in form.salarie_form.non_field_errors %}
-                            {{ error }}<br>
-                        {% endfor %}
-                    </div>
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.salarie_form.non_field_errors %}
+                    {{ error }}<br>
+                    {% endfor %}
+                </div>
                 {% endif %}
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -123,13 +125,13 @@
                         {{ form.salarie_form.last_name|add_class:"form-control" }}
                         <div class="text-danger small">{{ form.salarie_form.last_name.errors }}</div>
                     </div>
-                     <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="{{ form.salarie_form.social_security_number.id_for_label }}" class="form-label">{% trans "Social Security Number" %}</label>
                         {{ form.salarie_form.social_security_number|add_class:"form-control" }}
                         <div class="form-text text-muted">{{ form.salarie_form.social_security_number.help_text }}</div>
                         <div class="text-danger small">{{ form.salarie_form.social_security_number.errors }}</div>
                     </div>
-                     <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="{{ form.salarie_form.date_of_birth.id_for_label }}" class="form-label">{% trans "Date of Birth" %}</label>
                         {{ form.salarie_form.date_of_birth|add_class:"form-control" }}
                         <div class="text-danger small">{{ form.salarie_form.date_of_birth.errors }}</div>
@@ -139,17 +141,18 @@
                         {{ form.salarie_form.job_title|add_class:"form-control" }}
                         <div class="text-danger small">{{ form.salarie_form.job_title.errors }}</div>
                     </div>
-                    </div>
+                </div>
             </div>
 
+            {# --- Accident Details Section (Existing) --- #}
             <div class="mb-4">
                 <h5 class="mt-4 mb-3 text-primary">{% trans "Accident Details" %}</h5>
                 {% if form.accident_form.non_field_errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {% for error in form.accident_form.non_field_errors %}
-                            {{ error }}<br>
-                        {% endfor %}
-                    </div>
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.accident_form.non_field_errors %}
+                    {{ error }}<br>
+                    {% endfor %}
+                </div>
                 {% endif %}
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -177,9 +180,103 @@
                         {{ form.accident_form.detailed_circumstances|add_class:"form-control" }}
                         <div class="text-danger small">{{ form.accident_form.detailed_circumstances.errors }}</div>
                     </div>
-                    </div>
+                </div>
             </div>
 
+            {# --- Third Party Details Section (Existing) --- #}
+            <div class="mb-4">
+                <h5 class="mt-4 mb-3 text-primary">{% trans "Third Party Details" %}</h5>
+                {% if form.tiers_implique_form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.tiers_implique_form.non_field_errors %}
+                    {{ error }}<br>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.tiers_implique_form.nom.id_for_label }}" class="form-label">{% trans "Third Party Name" %}</label>
+                        {{ form.tiers_implique_form.nom|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.tiers_implique_form.nom.errors }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.tiers_implique_form.adresse.id_for_label }}" class="form-label">{% trans "Third Party Address" %}</label>
+                        {{ form.tiers_implique_form.adresse|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.tiers_implique_form.adresse.errors }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.tiers_implique_form.assurance.id_for_label }}" class="form-label">{% trans "Insurance" %}</label>
+                        {{ form.tiers_implique_form.assurance|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.tiers_implique_form.assurance.errors }}</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.tiers_implique_form.immatriculation.id_for_label }}" class="form-label">{% trans "Registration (e.g., vehicle)" %}</label>
+                        {{ form.tiers_implique_form.immatriculation|add_class:"form-control" }}
+                        <div class="text-danger small">{{ form.tiers_implique_form.immatriculation.errors }}</div>
+                    </div>
+                </div>
+            </div>
+
+
+            {# --- NEW: Witness Details Section (using formset) --- #}
+            <div class="mb-4" id="witness-details-section">
+                <h5 class="mt-4 mb-3 text-primary">{% trans "Witness Details" %}</h5>
+                {% if temoin_formset.non_form_errors %} {# Errors not tied to a specific form in the set #}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in temoin_formset.non_form_errors %}
+                    {{ error }}<br>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {{ temoin_formset.management_form }} {# IMPORTANT: Renders hidden fields for formset management #}
+
+                <div id="temoin-forms-container">
+                    {% for temoin_form in temoin_formset %}
+                    <div
+                        class="card mb-3 p-3 temoin-form-card {% if temoin_form.instance.pk %}existing-temoin{% else %}new-temoin{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="m-0 text-secondary">{% trans "Witness" %} #{{ forloop.counter }}</h6>
+                            {% if temoin_form.instance.pk %} {# Only show delete checkbox for existing forms #}
+                            <div class="form-check form-check-inline">
+                                {{ temoin_form.DELETE|add_class:"form-check-input" }}
+                                <label class="form-check-label" for="{{ temoin_form.DELETE.id_for_label }}">{% trans "Delete" %}</label>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        {# Display non-field errors for this specific form in the formset #}
+                        {% if temoin_form.non_field_errors %}
+                        <div class="alert alert-danger small" role="alert">
+                            {% for error in temoin_form.non_field_errors %}
+                            {{ error }}<br>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ temoin_form.nom.id_for_label }}" class="form-label">{% trans "Name" %}</label>
+                                {{ temoin_form.nom|add_class:"form-control" }}
+                                <div class="text-danger small">{{ temoin_form.nom.errors }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ temoin_form.coordonnees.id_for_label }}" class="form-label">{% trans "Contact Info" %}</label>
+                                {{ temoin_form.coordonnees|add_class:"form-control" }}
+                                <div class="text-danger small">{{ temoin_form.coordonnees.errors }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" id="add-temoin-form" class="btn btn-outline-info btn-sm mt-2">
+                    <i class="fas fa-plus-circle me-1"></i> {% trans "Add Another Witness" %}
+                </button>
+            </div>
+            {# --- END NEW: Witness Details Section --- #}
+
+
+            {# --- Document Upload Section (Existing) --- #}
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="{{ form.document_type.id_for_label }}" class="form-label">{% trans "Document Type (for file attachment)" %}</label>
@@ -203,7 +300,7 @@
                     <div class="text-danger small">{{ form.document_description.errors }}</div>
                 </div>
             </div>
-            
+
             <div class="d-flex justify-content-between gap-3 mt-3">
                 <div>
                     <a href="{% url 'atmp_app:dashboard' %}" class="btn btn-outline-secondary"
@@ -220,4 +317,86 @@
         </form>
     </div>
 </div>
+
+{# <-- THIS IS WHERE THE MISSING ENDBLOCK CONTENT GOES #}
+{% endblock content %} 
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addFormButton = document.getElementById('add-temoin-form');
+        const formContainer = document.getElementById('temoin-forms-container');
+        const totalForms = document.querySelector('#id_temoin_set-TOTAL_FORMS'); // Corrected ID
+        const initialForms = document.querySelector('#id_temoin_set-INITIAL_FORMS'); // Corrected ID
+
+        // Function to update form IDs and names
+        function updateElementIndex(element, prefix, index) {
+            const idRegex = new RegExp(`(${prefix}-(\\d+)-)`, 'g');
+            const nameRegex = new RegExp(`(${prefix}-(\\d+)-)`, 'g');
+
+            if (element.id) {
+                element.id = element.id.replace(idRegex, `${prefix}-${index}-`);
+            }
+            if (element.name) {
+                element.name = element.name.replace(nameRegex, `${prefix}-${index}-`);
+            }
+            if (element.htmlFor) { // For labels
+                element.htmlFor = element.htmlFor.replace(idRegex, `${prefix}-${index}-`);
+            }
+        }
+
+        // Function to add a new form
+        addFormButton.addEventListener('click', function () {
+            const currentTotalForms = parseInt(totalForms.value);
+            // Clone the 'template' form. Ensure this clone is clean (no existing data/errors).
+            // It's safer to have a hidden template form that doesn't get rendered initially,
+            // or ensure the first child of formContainer is *always* your template.
+            // For now, assuming first child is a good template.
+            const newForm = formContainer.children[0].cloneNode(true); 
+
+            // Reset fields and remove existing values/errors from cloned form
+            newForm.querySelectorAll('input').forEach(input => {
+                input.value = '';
+                input.checked = false; // For checkboxes like DELETE
+            });
+            newForm.querySelectorAll('.text-danger.small').forEach(errorDiv => {
+                errorDiv.textContent = ''; // Clear error messages
+            });
+            newForm.querySelectorAll('.alert-danger').forEach(alert => {
+                alert.remove(); // Remove non-field error alerts
+            });
+            newForm.classList.remove('existing-temoin');
+            newForm.classList.add('new-temoin');
+
+            // Update IDs and names for the new form
+            newForm.querySelectorAll('*').forEach(element => {
+                updateElementIndex(element, 'temoin_set', currentTotalForms); // Use 'temoin_set' as prefix
+            });
+
+            // Update the witness number label
+            const witnessNumberHeading = newForm.querySelector('h6');
+            if (witnessNumberHeading) {
+                witnessNumberHeading.textContent = `{% trans "Witness" %} #${currentTotalForms + 1}`;
+            }
+
+            // Remove the delete checkbox for new forms (they don't have a PK yet)
+            const deleteCheckboxDiv = newForm.querySelector('.form-check-inline');
+            if (deleteCheckboxDiv) {
+                 deleteCheckboxDiv.remove(); // Remove the delete checkbox for new forms
+            }
+
+
+            formContainer.appendChild(newForm);
+            totalForms.value = currentTotalForms + 1; // Increment TOTAL_FORMS
+        });
+
+        // Initial setup for existing forms if on update view
+        formContainer.querySelectorAll('.temoin-form-card.existing-temoin').forEach((formCard, index) => {
+            const witnessNumberHeading = formCard.querySelector('h6');
+            if (witnessNumberHeading) {
+                witnessNumberHeading.textContent = `{% trans "Witness" %} #${index + 1}`;
+            }
+        });
+    });
+</script>
 {% endblock %}

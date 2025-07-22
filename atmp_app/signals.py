@@ -20,7 +20,7 @@ def notify_syndic(sender, instance, created, **kwargs):
         Location: {instance.location}
         Description: {instance.description}
         ADMIN, Please review at: http://atmp.siisi.online/admin/atmp_app/dossieratmp/{instance.id}
-        HTML, Please review at: http://atmp.siisi.online/atmp_app/incidents/{instance.id}
+        HTML, Please review at: http://atmp.siisi.online/atmp/incidents/{instance.id}
         API, Please review at: http://atmp.siisi.online/atmp/api/dossiers/{instance.id}/
         """
 

@@ -81,15 +81,13 @@ class Action(models.Model):
 
 
 class Document(models.Model):
-    # A document can be associated with a Contentieux (if it's litigation-related)
-    # or exist independently related to a DossierATMP via ManyToMany.
     contentieux = models.ForeignKey('Contentieux', on_delete=models.CASCADE, related_name='document_set', null=True, blank=True)
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='uploaded_documents')
-    document_type = models.CharField(max_length=50, choices=DocumentType.choices)
-    original_name = models.CharField(max_length=255)
+    document_type = models.CharField(max_length=50, choices=DocumentType.choices, null=True, blank=True)
+    original_name = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    file = models.FileField(upload_to='documents/%Y/%m/%d/', default='documents/default.pdf')
-    mime_type = models.CharField(max_length=100)
+    file = models.FileField(upload_to='documents/%Y/%m/%d/', blank=True, null=True)
+    mime_type = models.CharField(max_length=100, blank=True, null=True)
     size = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -100,7 +98,26 @@ class Document(models.Model):
         verbose_name_plural = 'Documents'
 
     def __str__(self):
-        return self.original_name
+        # Provide a fallback if original_name is null
+        return self.original_name or f"Document (ID: {self.pk})"
+
+    def save(self, *args, **kwargs):
+        if self.file:
+            if not self.original_name:
+                 self.original_name = self.file.name
+
+            if not self.mime_type and self.file.file:
+                self.mime_type = self.file.file.content_type
+            
+            if not self.size:
+                self.size = self.file.size
+
+        else:
+            self.original_name = None
+            self.mime_type = None
+            self.size = None
+            
+        super().save(*args, **kwargs)
 
 
 class DossierATMP(models.Model):
@@ -143,8 +160,6 @@ class DossierATMP(models.Model):
             self.salarie = None
         if self.accident == {}:
             self.accident = None
-        # REMOVED: if self.temoins == []:
-        # REMOVED:    self.temoins = None
         if self.tiers_implique == {}:
             self.tiers_implique = None
             
@@ -156,9 +171,9 @@ class DossierATMP(models.Model):
 
 class Contentieux(models.Model):
     dossier_atmp = models.OneToOneField(DossierATMP, on_delete=models.CASCADE, related_name='contentieux')
-    reference = models.CharField(max_length=255, unique=True)
+    reference = models.CharField(max_length=255, unique=True, blank=True, null=True)
     subject = models.JSONField()
-    status = models.CharField(max_length=50, choices=ContentieuxStatus.choices, default=ContentieuxStatus.DRAFT)
+    status = models.CharField(max_length=50, choices=ContentieuxStatus.choices, default=ContentieuxStatus.DRAFT, null=True, blank=True)
     juridiction_steps = models.JSONField(default=dict)
     documents = models.ManyToManyField(Document, related_name='contentieux_documents', blank=True)
     actions = models.ManyToManyField(Action, related_name='contentieux_actions', blank=True)
@@ -172,7 +187,14 @@ class Contentieux(models.Model):
         verbose_name_plural = 'Contentieux'
 
     def __str__(self):
-        return self.reference
+        return self.reference or f"New Contentieux for {self.dossier_atmp.reference}"
+
+    # Add a save method to auto-generate the reference
+    def save(self, *args, **kwargs):
+        if not self.reference: # Only generate if it's not set (e.g., for new instances)
+            # You can base this on dossier reference, or just a new unique string
+            self.reference = f"CTX-{timezone.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:8].upper()}"
+        super().save(*args, **kwargs)
 
 
 class Audit(models.Model):
@@ -214,7 +236,7 @@ class AuditChecklistItem(models.Model):
 
 class JuridictionStep(models.Model):
     contentieux = models.ForeignKey(Contentieux, on_delete=models.CASCADE, related_name='juridiction_steps_set')
-    juridiction = models.CharField(max_length=50, choices=JuridictionType.choices)
+    juridiction = models.CharField(max_length=50, choices=JuridictionType.choices, null=True, blank=True)
     submitted_at = models.DateTimeField()
     decision = models.CharField(max_length=50, choices=[('FAVORABLE', 'Favorable'), ('DEFAVORABLE', 'Défavorable')], blank=True, null=True)
     decision_at = models.DateTimeField(blank=True, null=True)

@@ -1,7 +1,7 @@
 <!-- /home/siisi/atmp/atmp_app/templates/atmp_app/contentieux_form.html -->
 
 {% extends "base.html" %}
-{% load i18n crispy_forms_tags %}
+{% load i18n %} {# No widget_tweaks needed anymore #}
 
 {% block title %}{% if form.instance.pk %}{% trans "Edit Contentieux" %}{% else %}{% trans "Create Contentieux" %}{%endif %}{% endblock %}
 
@@ -25,26 +25,46 @@
         </h6>
     </div>
     <div class="card-body">
-        <form method="post" enctype="multipart/form-data" novalidate> {# Added novalidate to allow custom validation #}
+        <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
-            {{ form.non_field_errors }} {# Display form-wide errors #}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors %}
+                {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# Hidden dossier_atmp field, required for form submission #}
+            {{ form.dossier_atmp }}
 
             <div class="row">
                 <div class="col-md-6">
-                    {# reference field is likely read-only, ensure it's displayed correctly #}
-                    {% if form.instance.reference %}
+                    {# Display reference only for existing instances (read-only) #}
+                    {% if form.instance.pk %}
                     <div class="mb-3">
                         <label class="form-label">{% trans "Reference" %}</label>
                         <input type="text" class="form-control" value="{{ form.instance.reference }}" readonly>
                     </div>
-                    {% else %}
-                    {# If reference is generated on save, it might not be in the form. #}
-                    {# If it's a field in the form, render it like this: #}
-                    {{ form.reference|as_crispy_field }}
                     {% endif %}
                 </div>
                 <div class="col-md-6">
-                    {{ form.status|as_crispy_field }}
+                    {# Status field - rendered manually with its label #}
+                    <div class="mb-3">
+                        <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}</label>
+                        {{ form.status }}
+                        {% if form.status.help_text %}
+                        <div class="form-text text-muted">{{ form.status.help_text }}</div>
+                        {% endif %}
+                        {% if form.status.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.status.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
@@ -52,8 +72,40 @@
                 <div class="col-12">
                     <h5 class="mt-4 mb-3">{% trans "Subject Details" %}</h5>
                     <div class="border p-3 mb-3">
-                        {{ form.subject|as_crispy_field }}
-                        {# If you have nested JSON fields, render their sub-forms here if they exist #}
+                        {# Subject Title field #}
+                        <div class="mb-3">
+                            <label for="{{ form.subject_title.id_for_label }}" class="form-label">
+                                {{ form.subject_title.label }}
+                            </label>
+                            {{ form.subject_title }}
+                            {% if form.subject_title.help_text %}
+                            <small class="form-text text-muted">{{ form.subject_title.help_text }}</small>
+                            {% endif %}
+                            {% if form.subject_title.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.subject_title.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {# Subject Description field #}
+                        <div class="mb-3">
+                            <label for="{{ form.subject_description.id_for_label }}" class="form-label">
+                                {{ form.subject_description.label }}
+                            </label>
+                            {{ form.subject_description }}
+                            {% if form.subject_description.help_text %}
+                            <small class="form-text text-muted">{{ form.subject_description.help_text }}</small>
+                            {% endif %}
+                            {% if form.subject_description.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.subject_description.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -61,20 +113,57 @@
             <div class="row">
                 <div class="col-12">
                     <h5 class="mt-4 mb-3">{% trans "Juridiction Steps" %}</h5>
-                    <div class="border p-3 mb-3">
-                        {# Display juridiction_steps as a textarea for JSON input #}
-                        {{ form.juridiction_steps|as_crispy_field }}
-                        <small class="form-text text-muted">{% trans "Enter JSON for juridiction steps. E.g., {'step1':
-                            {'type': 'TRIBUNAL_JUDICIAIRE', 'date': 'YYYY-MM-DD'}}" %}</small>
+                    <div class="border p-3 mb-3" id="juridiction-steps-container">
+                        {# IMPORTANT: Renders hidden management fields for the formset #}
+                        {{ form.juridiction_step_formset.management_form }}
+
+                        {% for step_form in form.juridiction_step_formset %}
+                        <div class="juridiction-step-item border p-3 mb-3 bg-light rounded"
+                            id="step-form-{{ forloop.counter0 }}">
+                            <h6 class="mb-3">{% trans "Step" %} <span class="step-number">{{ forloop.counter }}</span>
+                            </h6>
+
+                            {% for field in step_form %}
+                            {% if not field.is_hidden %} {# Don't render hidden fields, like formset's DELETE checkbox #}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                <div class="form-text text-muted">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% if field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in field.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            {{ field }} {# Render any hidden fields for the step (like the ID field for existing steps if you add it) #}
+                            {% endif %}
+                            {% endfor %}
+
+                            {# Add the DELETE checkbox for each step if can_delete is enabled on the formset #}
+                            {% if form.juridiction_step_formset.can_delete %}
+                            <div class="form-check mt-2">
+                                <input type="checkbox" name="{{ step_form.DELETE.html_name }}"
+                                    id="{{ step_form.DELETE.id_for_label }}" class="form-check-input">
+                                <label class="form-check-label" for="{{ step_form.DELETE.id_for_label }}">{% trans "Delete Step" %}</label>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        {# Button to add new steps via JavaScript #}
+                        <button type="button" class="btn btn-outline-info btn-sm mt-2" id="add-step-btn">
+                            <i class="fas fa-plus-circle me-2"></i> {% trans "Add Another Step" %}
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {# Hidden field for dossier_atmp which is pre-populated in `get_initial` #}
-            {{ form.dossier_atmp }}
-
             <div class="d-flex justify-content-between mt-4">
-                {# Use the dossier_pk passed to the view (or available from self.dossier if set in dispatch) #}
                 <a href="{% url 'atmp_app:incident-detail' pk=dossier_pk %}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i> {% trans "Cancel" %}
                 </a>
@@ -85,4 +174,87 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addStepBtn = document.getElementById('add-step-btn');
+        const container = document.getElementById('juridiction-steps-container');
+        const totalFormsInput = document.querySelector('#id_juridiction_steps-TOTAL_FORMS');
+
+        // This template string is crucial for adding new forms via JavaScript
+        // It uses '__prefix__' as a placeholder, which will be replaced by the current form index
+        const templateFormHtml = `
+            <div class="juridiction-step-item border p-3 mb-3 bg-light rounded">
+                <h6 class="mb-3">{% trans "Step" %} <span class="step-number"></span></h6>
+                <div class="mb-3">
+                    <label class="form-label" for="id_juridiction_steps-__prefix__-step_type">{% trans "Type of Jurisdiction" %}</label>
+                    <select name="juridiction_steps-__prefix__-step_type" id="id_juridiction_steps-__prefix__-step_type" class="form-select">
+                        {# Loop through choices from the empty form's field (rendered once) #}
+                        {% for choice_val, choice_label in form.juridiction_step_formset.empty_form.step_type.field.choices %}
+                            <option value="{{ choice_val }}">{{ choice_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="id_juridiction_steps-__prefix__-step_date">{% trans "Date" %}</label>
+                    <input type="date" name="juridiction_steps-__prefix__-step_date" id="id_juridiction_steps-__prefix__-step_date" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="id_juridiction_steps-__prefix__-step_notes">{% trans "Notes" %}</label>
+                    <textarea name="juridiction_steps-__prefix__-step_notes" id="id_juridiction_steps-__prefix__-step_notes" class="form-control" rows="2"></textarea>
+                </div>
+                {% if form.juridiction_step_formset.can_delete %}
+                <div class="form-check mt-2">
+                    <input type="checkbox" name="juridiction_steps-__prefix__-DELETE" id="id_juridiction_steps-__prefix__-DELETE" class="form-check-input">
+                    <label class="form-check-label" for="id_juridiction_steps-__prefix__-DELETE">{% trans "Delete Step" %}</label>
+                </div>
+                {% endif %}
+            </div>
+        `;
+
+        addStepBtn.addEventListener('click', function () {
+            let currentFormCount = parseInt(totalFormsInput.value);
+            const newFormHtml = templateFormHtml.replace(/__prefix__/g, currentFormCount);
+
+            const newFormElement = document.createElement('div');
+            newFormElement.innerHTML = newFormHtml.trim();
+
+            // Append the new form element directly before the add button
+            container.insertBefore(newFormElement.firstChild, addStepBtn);
+
+            // Update totalFormsInput to reflect the new total number of forms
+            totalFormsInput.value = currentFormCount + 1;
+
+            // Update step number in the newly added form
+            const newStepNumberSpan = newFormElement.querySelector('.step-number');
+            if (newStepNumberSpan) {
+                newStepNumberSpan.textContent = currentFormCount + 1;
+            }
+        });
+
+        // Event listener for delete checkboxes to add visual feedback and disable fields
+        container.addEventListener('change', function (event) {
+            if (event.target.matches('input[type="checkbox"][name$="-DELETE"]')) {
+                const formItem = event.target.closest('.juridiction-step-item');
+                if (formItem) {
+                    if (event.target.checked) {
+                        formItem.classList.add('bg-danger-subtle', 'text-muted'); // Visually mark for deletion
+                        // Disable all other inputs/selects/textareas in this form item
+                        formItem.querySelectorAll('input:not([name$="-DELETE"]), select, textarea').forEach(input => {
+                            input.disabled = true;
+                        });
+                    } else {
+                        formItem.classList.remove('bg-danger-subtle', 'text-muted');
+                        // Re-enable all other inputs/selects/textareas in this form item
+                        formItem.querySelectorAll('input:not([name$="-DELETE"]), select, textarea').forEach(input => {
+                            input.disabled = false;
+                        });
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

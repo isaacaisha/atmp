@@ -1,0 +1,82 @@
+<!-- /home/siisi/atmp/atmp_app/templates/atmp_app/profile.html -->
+
+{% extends "base.html" %}
+{% load i18n widget_tweaks %}
+
+{% block title %}{% trans "My Profile" %}{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{% trans "My Profile" %}</h1>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "Personal Information" %}</h6>
+    </div>
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {# Display non-field errors from the profile form #}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">{% trans "Full Name" %}</label>
+                    {{ form.name|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.name.errors }}</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">{% trans "Email Address" %}</label>
+                    {{ form.email|add_class:"form-control" }}
+                    <div class="text-danger small">{{ form.email.errors }}</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{% trans "Role" %}</label>
+                    <input type="text" class="form-control" value="{{ user_profile.get_role_display }}" readonly>
+                    <div class="form-text text-muted">{% trans "Your role cannot be changed here." %}</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{% trans "2-Factor Authentication (2FA)" %}</label>
+                    <input type="text" class="form-control" value="{% if has_2fa %}{% trans "Enabled" %}{% else %}{% trans "Disabled" %}{% endif %}" readonly>
+                    <div class="form-text text-muted">{% trans "Manage 2FA separately if implemented." %}</div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between gap-3 mt-3">
+                <div>
+                    <a href="{% url 'atmp_app:dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> {% trans 'Back to Dashboard' %}
+                    </a>
+                </div>
+                <div class="d-grid text-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> {% trans "Save Profile" %}
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <hr class="my-4">
+
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "Change Password" %}</h6>
+        <div class="card-body">
+            <p>{% trans "For security reasons, changing your password is handled on a separate page." %}</p>
+            <a href="{% url 'users:password_reset' %}" class="btn btn-info">
+                <i class="fas fa-key me-1"></i> {% trans "Change Password" %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
