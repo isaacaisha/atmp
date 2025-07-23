@@ -122,7 +122,7 @@ class Document(models.Model):
 
 class DossierATMP(models.Model):
     reference = models.CharField(max_length=255, unique=True, blank=True)
-    safety_manager = models.ForeignKey(User, on_delete=models.PROTECT, related_name='managed_dossiers')
+    safety_manager = models.ForeignKey(User, on_delete=models.PROTECT, related_name='managed_dossiers', null=True, blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
     date_of_incident = models.DateField()

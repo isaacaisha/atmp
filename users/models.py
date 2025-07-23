@@ -19,7 +19,8 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('role', UserRole.ADMIN)  # Set default role for superuser
+        extra_fields.setdefault('role', UserRole.ADMIN)
+        extra_fields.setdefault('is_seeded', False)
         if extra_fields.get('is_staff') is not True:
             raise ValueError(_('Superuser must have is_staff=True.'))
         if extra_fields.get('is_superuser') is not True:
@@ -49,6 +50,7 @@ class CustomUser(AbstractUser):
         verbose_name=_('Role'),
         help_text=_('Defines the user role in the system')
     )
+    is_seeded = models.BooleanField(default=False, help_text=_('Indicates if this user was created by a seeding script')) # NEW FIELD
 
     USERNAME_FIELD  = 'email'
     REQUIRED_FIELDS = []
@@ -64,7 +66,7 @@ class CustomUser(AbstractUser):
     @property
     def ROLE_CHOICES(cls):
         return UserRole.choices
-        
+
     @property
     def is_safety_manager(self):
         return self.role == UserRole.SAFETY_MANAGER
@@ -76,4 +78,3 @@ class CustomUser(AbstractUser):
     @property
     def is_admin(self):
         return self.role == UserRole.ADMIN or self.is_superuser
-    

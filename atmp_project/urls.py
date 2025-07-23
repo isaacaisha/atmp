@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.urls import path, include
+from atmp_app import views_api
 from django.conf import settings
 from django.views.generic import RedirectView
 from two_factor.urls import urlpatterns as tf_urls
@@ -20,6 +21,9 @@ urlpatterns = [
 
     # 2) Admin site
     path('admin/', admin.site.urls),
+
+    # Custom API Root - now points to your custom APIRootView
+    path('atmp/api/', views_api.RootAPIView.as_view(), name='api-root'),
 
     # 3) Built‑in auth views (login, logout, password reset at /accounts/…)
     path('accounts/', include(('django.contrib.auth.urls', 'accounts'), namespace='accounts')),

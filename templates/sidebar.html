@@ -84,8 +84,10 @@
                 <span>{% trans "Report New Incident" %}</span>
             </a>
         </li>
+
         <!-- Divider -->
         <hr class="sidebar-divider">
+
         {# Link to profile page #}
         <li class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
             <a class="nav-link" href="{% url 'atmp_app:profile' %}">
@@ -93,18 +95,15 @@
                 <span>{% trans "My Profile" %}</span>
             </a>
         </li>
+
         <!-- Divider -->
         <hr class="sidebar-divider">
     {% endif %}
-    {# If you have other elements, continue them here #}
 
     <!-- Sidebar Toggler (if you have one) -->
     <div class="text-center d-none d-md-inline">
         <button class="rounded-circle border-0" id="sidebarToggle"></button>
     </div>
-
-    <!-- Divider -->
-    <hr class="sidebar-divider">
     
     <!-- Heading -->
     <div class="sidebar-heading">

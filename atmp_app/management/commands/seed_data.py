@@ -3,6 +3,7 @@
 from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db.models import Q # Import Q for complex queries
 from django.utils import timezone
 
 from atmp_app.models import (
@@ -24,52 +25,118 @@ class Command(BaseCommand):
         self.stdout.write("🔄 Starting data seeding…")
 
         with transaction.atomic():
-            # 1) wipe existing data
-            Temoin.objects.all().delete()
-            Tiers.objects.all().delete()
-            Audit.objects.all().delete()
-            Contentieux.objects.all().delete()
-            DossierATMP.objects.all().delete()
-            Document.objects.all().delete()
-            Action.objects.all().delete()
-            User.objects.all().delete()
-            self.stdout.write("🗑️  Cleared old rows")
+            # 1) Selective wipe existing seed data
+            # The most robust way for development is to delete users by the pattern they use.
+            # This handles cases where 'is_seeded' might not have been set on previous runs or manual creations.
+            seeded_user_email_pattern = '@example.com'
+            users_to_delete_by_email_pattern = User.objects.filter(email__endswith=seeded_user_email_pattern)
 
-            # 2) Create users
+            # Important: Get the IDs *before* deleting anything to ensure querysets aren't affected
+            users_to_delete_ids = list(users_to_delete_by_email_pattern.values_list('id', flat=True))
+
+
+            self.stdout.write("🗑️  Clearing old seed data related to '@example.com' users...")
+
+            # A) Delete Documents uploaded by these users
+            # Ensure related objects are deleted first if they depend on users
+            Document.objects.filter(uploaded_by__in=users_to_delete_by_email_pattern).delete()
+            self.stdout.write("🗑️  Cleared documents uploaded by previous seed users.")
+
+            # B) Identify DossierATMP objects created by or assigned to these users
+            # Deleting DossierATMP will cascade to Contentieux, Audit, Temoin, and Tiers
+            dossiers_to_delete = DossierATMP.objects.filter(
+                Q(created_by__in=users_to_delete_by_email_pattern) |
+                Q(safety_manager__in=users_to_delete_by_email_pattern)
+            )
+            count_dossiers_deleted = dossiers_to_delete.count()
+            if count_dossiers_deleted > 0:
+                dossiers_to_delete.delete()
+                self.stdout.write(f"🗑️  Cleared {count_dossiers_deleted} DossierATMP objects and their related data.")
+            else:
+                self.stdout.write("🗑️  No DossierATMP objects linked to previous seed users found.")
+
+            # C) Delete all Action objects (as they are not directly linked to specific users in the seed data)
+            # If Actions could be created by non-seeded users, this would need refinement.
+            Action.objects.all().delete()
+            self.stdout.write("🗑️  Cleared all Action objects.")
+
+            # D) Finally, delete the users themselves based on the email pattern
+            count_users_deleted = users_to_delete_by_email_pattern.count()
+            if count_users_deleted > 0:
+                users_to_delete_by_email_pattern.delete()
+                self.stdout.write(f"🗑️  Cleared {count_users_deleted} previous seed users ('@example.com').")
+            else:
+                self.stdout.write("🗑️  No previous seed users ('@example.com') found to clear.")
+
+            self.stdout.write("🗑️  Old seed data cleared selectively.")
+
+            # 2) Create users (this part remains the same, but now it will succeed)
             admin = User.objects.create_user(
                 email='admin@example.com',
                 password='secret',
                 name='Admin User',
                 role=UserRole.ADMIN,
                 is_staff=True,
-                is_superuser=True
+                is_superuser=True,
+                is_seeded=True # Mark as seeded
             )
-            # FIX: Change UserRole.JURIST to UserRole.JURISTE
             juriste = User.objects.create_user(
                 email='juriste@example.com',
                 password='juriste123',
                 name='Juriste Alpha',
-                role=UserRole.JURISTE # <-- Corrected: Use JURISTE
+                role=UserRole.JURISTE,
+                is_staff=True,
+                is_seeded=True # Mark as seeded
             )
             rh = User.objects.create_user(
                 email='rh@example.com',
                 password='rh123',
                 name='RH Beta',
-                role=UserRole.RH
+                role=UserRole.RH,
+                is_staff=True,
+                is_seeded=True # Mark as seeded
             )
             safety_manager = User.objects.create_user(
                 email='safety@example.com',
                 password='safety123',
                 name='Safety Manager Gamma',
-                role=UserRole.SAFETY_MANAGER
+                role=UserRole.SAFETY_MANAGER,
+                is_staff=True,
+                is_seeded=True # Mark as seeded
+            )
+            manager = User.objects.create_user(
+                email='manager@example.com',
+                password='manager123',
+                name='Manager Charlie',
+                role=UserRole.MANAGER,
+                is_staff=True,
+                is_seeded=True # Mark as seeded
+            )
+            qse = User.objects.create_user(
+                email='qse@example.com',
+                password='qse123',
+                name='QSE David',
+                role=UserRole.QSE,
+                is_staff=True,
+                is_seeded=True # Mark as seeded
+            )
+            direction = User.objects.create_user(
+                email='direction@example.com',
+                password='direction123',
+                name='Direction Eric',
+                role=UserRole.DIRECTION,
+                is_staff=True,
+                is_seeded=True # Mark as seeded
             )
             employee = User.objects.create_user(
                 email='employee@example.com',
                 password='employee123',
                 name='Employee Delta',
-                role=UserRole.EMPLOYEE
+                role=UserRole.EMPLOYEE,
+                is_staff=False,
+                is_seeded=True # Mark as seeded
             )
-            self.stdout.write(self.style.SUCCESS("✅ Users created"))
+            self.stdout.write(self.style.SUCCESS("✅ Users created for all roles"))
 
             # 3) Dossier ATMP
             dossier = DossierATMP.objects.create(

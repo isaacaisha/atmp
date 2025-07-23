@@ -7,7 +7,7 @@ from rest_framework.routers import DefaultRouter
 from .auth_views import AuthViewSet
 
 from .views_api import (
-    CustomAPIRootView,
+    AllEndpointsView,
     CustomDefaultRouter,
     DossierViewSet,
     ContentieuxViewSet,
@@ -33,7 +33,7 @@ from .views import (
     JuridiqueDashboardHTMLView,
     RHDashboardHTMLView,
     QSEDashboardHTMLView,
-    DirectionDashboardHTMLView,
+    DirectionDashboardHTMLView
 )
 
 app_name = 'atmp_app'
@@ -50,6 +50,7 @@ urlpatterns = [
     # ─── API ───────────────────────────────────────────────────────
     path('api/', include(router.urls)),
     # API Dashboard endpoints (keeping these as function views for specific data access)
+    path('api/root', AllEndpointsView.as_view(), name='root'),
     path('api/dashboard/juridique/', get_jurist_dashboard_data, name='jurist_dashboard_data'),
     path('api/dashboard/rh/', get_rh_dashboard_data, name='rh_dashboard_data'),
     path('api/dashboard/qse/', get_qse_dashboard_data, name='qse_dashboard_data'),
